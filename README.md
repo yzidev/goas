@@ -1,4 +1,4 @@
-# go-auto-openapi (openapigo)
+# Openapigo
 
 Auto-generate OpenAPI 3.0 spec from your Go route registrations.
 

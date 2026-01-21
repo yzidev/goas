@@ -59,7 +59,7 @@ func BuildSpec(routes []RouteMeta, cfg Config) *openapi3.T {
 				})
 			}
 		} else {
-			for _, p := range infer.PathParams(route.Path) {
+			for _, p := range infer.PathParams(path) {
 				op.AddParameter(&openapi3.Parameter{
 					Name:     p,
 					In:       openapi3.ParameterInPath,

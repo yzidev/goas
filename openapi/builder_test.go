@@ -293,3 +293,28 @@ func TestResponsesMultipleStatusCodes(t *testing.T) {
 		t.Fatalf("expected 500 response")
 	}
 }
+
+func TestPathParamInferenceFromColonStyle(t *testing.T) {
+	r := NewRouter()
+	r.GET("/users/:id", func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+
+	doc := BuildSpec(r.Routes(), Config{Title: "T", Version: "1"})
+	p := doc.Paths.Find("/users/{id}")
+	if p == nil || p.Get == nil {
+		t.Fatalf("expected GET /users/{id}")
+	}
+	if len(p.Get.Parameters) == 0 {
+		t.Fatalf("expected a path parameter to be inferred")
+	}
+	found := false
+	for _, pr := range p.Get.Parameters {
+		if pr.Value != nil && pr.Value.In == openapi3.ParameterInPath && pr.Value.Name == "id" {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatalf("expected path param id, got %#v", p.Get.Parameters)
+	}
+}

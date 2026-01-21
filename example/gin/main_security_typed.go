@@ -22,6 +22,10 @@ type SecCreateUser struct {
 	Name string `json:"name"`
 }
 
+type ErrorResponse struct {
+	Error string `json:"error"`
+}
+
 func main() {
 	r := gin.New()
 
@@ -43,14 +47,28 @@ func main() {
 			return SecUser{}, http.StatusUnauthorized, nil
 		}
 		return SecUser{ID: "1", Name: in.Name}, http.StatusCreated, nil
-	}, gin.WithSecurity(&bearer))
+	},
+		gin.WithSecurity(&bearer),
+		gin.WithTags("Secure Users"),
+		gin.WithResponses(
+			openapi.ResponseSpec{Status: http.StatusCreated, Schema: SecUser{}, Description: "Created"},
+			openapi.ResponseSpec{Status: http.StatusUnauthorized, Schema: ErrorResponse{}, Description: "Unauthorized"},
+		),
+	)
 
 	gin.GETT[struct{}, []SecUser](r, "/secure/users", func(c *ginlib.Context, _ struct{}) ([]SecUser, int, error) {
 		if c.GetHeader("X-API-Key") == "" {
 			return nil, http.StatusUnauthorized, nil
 		}
 		return []SecUser{{ID: "1", Name: "Alice"}}, http.StatusOK, nil
-	}, gin.WithSecurity(&apiKey))
+	},
+		gin.WithSecurity(&apiKey),
+		gin.WithTags("Secure Users"),
+		gin.WithResponses(
+			openapi.ResponseSpec{Status: http.StatusOK, Schema: []SecUser{}, Description: "OK"},
+			openapi.ResponseSpec{Status: http.StatusUnauthorized, Schema: ErrorResponse{}, Description: "Unauthorized"},
+		),
+	)
 
 	gin.Register(r, cfg)
 	_ = r.Engine.Run(":8080")

@@ -260,3 +260,36 @@ func TestTopLevelTagsFromConfig(t *testing.T) {
 		t.Fatalf("expected top-level tags to contain Users, got %#v", doc.Tags)
 	}
 }
+
+func TestResponsesMultipleStatusCodes(t *testing.T) {
+	type Err struct {
+		Error string `json:"error"`
+	}
+	type User struct {
+		ID string `json:"id"`
+	}
+
+	r := NewRouter()
+	r.POST("/users", func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusCreated)
+	}, WithResponses(
+		ResponseSpec{Status: http.StatusCreated, Schema: User{}, Description: "Created"},
+		ResponseSpec{Status: http.StatusBadRequest, Schema: Err{}, Description: "Bad Request"},
+		ResponseSpec{Status: http.StatusInternalServerError, Schema: Err{}, Description: "Internal Server Error"},
+	))
+
+	doc := BuildSpec(r.Routes(), Config{Title: "T", Version: "1"})
+	p := doc.Paths.Find("/users")
+	if p == nil || p.Post == nil {
+		t.Fatalf("expected POST /users")
+	}
+	if p.Post.Responses.Value("201") == nil {
+		t.Fatalf("expected 201 response")
+	}
+	if p.Post.Responses.Value("400") == nil {
+		t.Fatalf("expected 400 response")
+	}
+	if p.Post.Responses.Value("500") == nil {
+		t.Fatalf("expected 500 response")
+	}
+}

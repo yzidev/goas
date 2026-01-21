@@ -15,16 +15,27 @@ type User struct {
 	Name string `json:"name"`
 }
 
+type ErrorResponse struct {
+	Error string `json:"error"`
+}
+
 func main() {
 	r := openapi.NewRouter()
 
 	r.GET("/users", func(w http.ResponseWriter, _ *http.Request) {
 		json.NewEncoder(w).Encode([]User{{ID: "1", Name: "Alice"}})
-	}, openapi.WithTags("Users"))
+	}, openapi.WithTags("Users"), openapi.WithResponses(
+		openapi.ResponseSpec{Status: http.StatusOK, Schema: []User{}, Description: "OK"},
+		openapi.ResponseSpec{Status: http.StatusInternalServerError, Schema: ErrorResponse{}, Description: "Internal Server Error"},
+	))
 
 	r.POST("/users", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusCreated)
-	}, openapi.WithTags("Users"))
+	}, openapi.WithTags("Users"), openapi.WithResponses(
+		openapi.ResponseSpec{Status: http.StatusCreated, Schema: struct{}{}, Description: "Created"},
+		openapi.ResponseSpec{Status: http.StatusBadRequest, Schema: ErrorResponse{}, Description: "Bad Request"},
+		openapi.ResponseSpec{Status: http.StatusInternalServerError, Schema: ErrorResponse{}, Description: "Internal Server Error"},
+	))
 
 	openapi.Register(r, openapi.Config{
 		Title:   "User API",

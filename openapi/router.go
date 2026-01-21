@@ -17,6 +17,7 @@ type RouteMeta struct {
 	Tags           []string
 	RequestSchema  interface{}
 	ResponseSchema interface{}
+	Responses      []ResponseSpec
 	Security       *openapi3.SecurityRequirement
 	QueryParams    []QueryParam
 	PathParams     []PathParamSpec

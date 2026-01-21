@@ -2,6 +2,7 @@ package openapi
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/aizacoders/openapigo/openapi/infer"
@@ -78,11 +79,26 @@ func BuildSpec(routes []RouteMeta, cfg Config) *openapi3.T {
 			op.RequestBody = &openapi3.RequestBodyRef{Value: &openapi3.RequestBody{Required: true, Content: openapi3.NewContentWithJSONSchemaRef(schemaRef)}}
 		}
 
+		// Default response behavior (backward-compatible)
 		if route.ResponseSchema != nil {
 			schemaRef := infer.ResponseSchema(doc, route.ResponseSchema)
 			op.Responses.Set("200", &openapi3.ResponseRef{Value: &openapi3.Response{Description: ptr("OK"), Content: openapi3.NewContentWithJSONSchemaRef(schemaRef)}})
 		} else {
 			op.Responses.Set("200", &openapi3.ResponseRef{Value: &openapi3.Response{Description: ptr("OK")}})
+		}
+
+		// Additional/override responses (errors, other success statuses)
+		for _, rr := range route.Responses {
+			if rr.Status <= 0 {
+				continue
+			}
+			key := strconv.Itoa(rr.Status)
+			resp := &openapi3.Response{Description: ptr(rr.normalizedDescription())}
+			if rr.Schema != nil {
+				schemaRef := infer.ResponseSchema(doc, rr.Schema)
+				resp.Content = openapi3.NewContentWithJSONSchemaRef(schemaRef)
+			}
+			op.Responses.Set(key, &openapi3.ResponseRef{Value: resp})
 		}
 
 		if route.Security != nil {

@@ -101,6 +101,25 @@ func BuildSpec(routes []RouteMeta, cfg Config) *openapi3.T {
 			op.Responses.Set(key, &openapi3.ResponseRef{Value: resp})
 		}
 
+		// Default error responses (only when user didn't explicitly declare responses)
+		// This keeps the "simple usage" experience while still allowing customization.
+		if len(route.Responses) == 0 {
+			// 401 for secured endpoints
+			if route.Security != nil {
+				errSchema := infer.ResponseSchema(doc, ErrorResponse{})
+				op.Responses.Set("401", &openapi3.ResponseRef{Value: &openapi3.Response{Description: ptr("Unauthorized"), Content: openapi3.NewContentWithJSONSchemaRef(errSchema)}})
+			}
+			// 400 for likely body-bearing methods
+			switch route.Method {
+			case http.MethodPost, http.MethodPut, http.MethodPatch:
+				errSchema := infer.ResponseSchema(doc, ErrorResponse{})
+				op.Responses.Set("400", &openapi3.ResponseRef{Value: &openapi3.Response{Description: ptr("Bad Request"), Content: openapi3.NewContentWithJSONSchemaRef(errSchema)}})
+			}
+			// default 500
+			errSchema := infer.ResponseSchema(doc, ErrorResponse{})
+			op.Responses.Set("500", &openapi3.ResponseRef{Value: &openapi3.Response{Description: ptr("Internal Server Error"), Content: openapi3.NewContentWithJSONSchemaRef(errSchema)}})
+		}
+
 		if route.Security != nil {
 			op.Security = &openapi3.SecurityRequirements{*route.Security}
 		}

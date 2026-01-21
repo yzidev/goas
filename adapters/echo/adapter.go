@@ -5,6 +5,7 @@ package echo
 import (
 	"net/http"
 	"reflect"
+	"strings"
 
 	echolib "github.com/labstack/echo/v4"
 
@@ -215,4 +216,54 @@ func DELETET[TReq any, TRes any](r *Router, path string, h TypedHandler[TReq, TR
 		base = append(base, resOpt)
 	}
 	r.Handle(http.MethodDelete, path, wrapTyped(h), mergeOpts(base, opts...)...)
+}
+
+// Group allows applying shared options (e.g., tags/security) and a common path prefix.
+type Group struct {
+	prefix string
+	opts   []HandlerOption
+	r      *Router
+}
+
+func (r *Router) Group(prefix string, opts ...HandlerOption) *Group {
+	return &Group{prefix: prefix, opts: opts, r: r}
+}
+
+func (g *Group) Handle(method, p string, h echolib.HandlerFunc, opts ...HandlerOption) {
+	all := make([]HandlerOption, 0, len(g.opts)+len(opts))
+	all = append(all, g.opts...)
+	all = append(all, opts...)
+	g.r.Handle(method, joinPaths(g.prefix, p), h, all...)
+}
+
+func (g *Group) GET(p string, h echolib.HandlerFunc, opts ...HandlerOption) {
+	g.Handle(http.MethodGet, p, h, opts...)
+}
+func (g *Group) POST(p string, h echolib.HandlerFunc, opts ...HandlerOption) {
+	g.Handle(http.MethodPost, p, h, opts...)
+}
+func (g *Group) PUT(p string, h echolib.HandlerFunc, opts ...HandlerOption) {
+	g.Handle(http.MethodPut, p, h, opts...)
+}
+func (g *Group) PATCH(p string, h echolib.HandlerFunc, opts ...HandlerOption) {
+	g.Handle(http.MethodPatch, p, h, opts...)
+}
+func (g *Group) DELETE(p string, h echolib.HandlerFunc, opts ...HandlerOption) {
+	g.Handle(http.MethodDelete, p, h, opts...)
+}
+
+func joinPaths(prefix, p string) string {
+	if prefix == "" {
+		return p
+	}
+	if p == "" {
+		return prefix
+	}
+	if strings.HasSuffix(prefix, "/") {
+		prefix = strings.TrimSuffix(prefix, "/")
+	}
+	if !strings.HasPrefix(p, "/") {
+		p = "/" + p
+	}
+	return prefix + p
 }

@@ -1,4 +1,4 @@
-//go:build echo && !typed
+//go:build echo && !typed && !security
 
 package main
 
@@ -7,8 +7,8 @@ import (
 
 	echolib "github.com/labstack/echo/v4"
 
-	"openapigo/adapters/echo"
-	"openapigo/openapi"
+	"github.com/aizacoders/openapigo/adapters/echo"
+	"github.com/aizacoders/openapigo/openapi"
 )
 
 type User struct {

@@ -8,7 +8,7 @@ import (
 
 	ginlib "github.com/gin-gonic/gin"
 
-	"openapigo/openapi"
+	"github.com/aizacoders/openapigo/openapi"
 
 	"github.com/getkin/kin-openapi/openapi3"
 )

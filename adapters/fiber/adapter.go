@@ -8,8 +8,8 @@ import (
 
 	fiberlib "github.com/gofiber/fiber/v2"
 
+	"github.com/aizacoders/openapigo/openapi"
 	"github.com/getkin/kin-openapi/openapi3"
-	"openapigo/openapi"
 )
 
 type Router struct {

@@ -3,7 +3,7 @@ package httprouter
 import (
 	"net/http"
 
-	"openapigo/openapi"
+	"github.com/aizacoders/openapigo/openapi"
 )
 
 // Router is the default net/http router implementation.

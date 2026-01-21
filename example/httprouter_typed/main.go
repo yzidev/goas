@@ -1,10 +1,12 @@
+//go:build !security
+
 package main
 
 import (
 	"net/http"
 
-	"openapigo/adapters/httprouter"
-	"openapigo/openapi"
+	"github.com/aizacoders/openapigo/adapters/httprouter"
+	"github.com/aizacoders/openapigo/openapi"
 )
 
 type User struct {

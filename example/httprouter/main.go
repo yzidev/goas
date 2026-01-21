@@ -1,10 +1,12 @@
+//go:build !security
+
 package main
 
 import (
 	"encoding/json"
 	"net/http"
 
-	"openapigo/openapi"
+	"github.com/aizacoders/openapigo/openapi"
 )
 
 type User struct {

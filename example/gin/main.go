@@ -1,4 +1,4 @@
-//go:build gin && !typed
+//go:build gin && !typed && !security
 
 package main
 
@@ -7,8 +7,8 @@ import (
 
 	ginlib "github.com/gin-gonic/gin"
 
-	"openapigo/adapters/gin"
-	"openapigo/openapi"
+	"github.com/aizacoders/openapigo/adapters/gin"
+	"github.com/aizacoders/openapigo/openapi"
 )
 
 type User struct {

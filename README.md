@@ -57,3 +57,78 @@ openapi.POSTT[CreateUser, User](r, "/users", func(w http.ResponseWriter, req *ht
 Notes:
 - Use `struct{}` as TReq if the endpoint has no request body.
 - Use `struct{}` as TRes if the endpoint has no JSON response body.
+
+## Security examples (Bearer JWT + X-API-Key)
+
+There are additional examples that demonstrate multiple OpenAPI security schemes and per-route requirements.
+They are guarded by an extra build tag: `security`.
+
+### net/http (typed)
+```bash
+go run -tags security ./example/httprouter_typed
+```
+
+### Gin (typed + security)
+```bash
+go run -tags "gin,typed,security" ./example/gin
+```
+
+### Echo (typed + security)
+```bash
+go run -tags "echo,typed,security" ./example/echo
+```
+
+### Fiber (typed + security)
+```bash
+go run -tags "fiber,typed,security" ./example/fiber
+```
+
+Once running, open:
+- `http://localhost:8080/swagger`
+
+Try calling endpoints:
+- `POST /secure/users` with `Authorization: Bearer <token>`
+- `GET /secure/users` with `X-API-Key: <key>`
+
+## Installation
+
+```bash
+go get github.com/aizacoders/openapigo@latest
+```
+
+Import:
+
+```go
+import "github.com/aizacoders/openapigo/openapi"
+```
+
+## Minimal example (net/http)
+
+```go
+package main
+
+import (
+	"encoding/json"
+	"net/http"
+
+	"github.com/aizacoders/openapigo/openapi"
+)
+
+type User struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+func main() {
+	r := openapi.NewRouter()
+
+	r.GET("/users", func(w http.ResponseWriter, _ *http.Request) {
+		_ = json.NewEncoder(w).Encode([]User{{ID: "1", Name: "Alice"}})
+	})
+
+	openapi.Register(r, openapi.Config{Title: "User API", Version: "1.0.0"})
+	_ = http.ListenAndServe(":8080", r)
+}
+```
+
+For more detailed usage, please refer to the [examples](./example) directory.

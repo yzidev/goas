@@ -8,8 +8,8 @@ import (
 
 	echolib "github.com/labstack/echo/v4"
 
+	"github.com/aizacoders/openapigo/openapi"
 	"github.com/getkin/kin-openapi/openapi3"
-	"openapigo/openapi"
 )
 
 type Router struct {

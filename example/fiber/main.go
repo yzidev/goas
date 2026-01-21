@@ -1,4 +1,4 @@
-//go:build fiber && !typed
+//go:build fiber && !typed && !security
 
 package main
 
@@ -7,8 +7,8 @@ import (
 
 	fiberlib "github.com/gofiber/fiber/v2"
 
-	"openapigo/adapters/fiber"
-	"openapigo/openapi"
+	"github.com/aizacoders/openapigo/adapters/fiber"
+	"github.com/aizacoders/openapigo/openapi"
 )
 
 type User struct {

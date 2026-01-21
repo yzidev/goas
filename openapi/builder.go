@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"openapigo/openapi/infer"
+	"github.com/aizacoders/openapigo/openapi/infer"
 
 	"github.com/getkin/kin-openapi/openapi3"
 )

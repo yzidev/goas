@@ -24,6 +24,7 @@ var (
 	WithTags           = openapi.WithTags
 	WithResponses      = openapi.WithResponses
 	WithQueryParams    = openapi.WithQueryParams
+	JSONRoute          = openapi.JSONRoute
 )
 
 // Re-export helpers.

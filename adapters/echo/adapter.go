@@ -31,6 +31,7 @@ var (
 	WithTags           = openapi.WithTags
 	WithResponses      = openapi.WithResponses
 	WithQueryParams    = openapi.WithQueryParams
+	JSONRoute          = openapi.JSONRoute
 )
 
 func (r *Router) Handle(method, path string, h echolib.HandlerFunc, opts ...HandlerOption) {

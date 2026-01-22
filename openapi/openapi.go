@@ -29,6 +29,10 @@ type Config struct {
 	Tags            openapi3.Tags
 	SpecPath        string
 	SwaggerPath     string
+
+	// Schemas registers component schemas by name without attaching them to a route.
+	// Useful when you want config-only schema registration.
+	Schemas SchemaRegistry
 }
 
 func Register(r *Router, cfg Config) {

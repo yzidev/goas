@@ -36,22 +36,27 @@ func main() {
 
 	users.GET("/users", func(c echolib.Context) error {
 		return echo.JSON(c, http.StatusOK, []User{{ID: "1", Name: "Alice"}})
-	})
+	}, echo.JSONRoute(nil, []User{}, http.StatusOK)...)
 
 	users.GET("/search", func(c echolib.Context) error {
 		_ = c.QueryParam("q")
 		return c.NoContent(http.StatusOK)
-	}, echo.WithQueryParams(
-		openapi.QueryParam{Name: "q", Type: openapi.ParamString, Required: true, Description: "Search term"},
-		openapi.QueryParam{Name: "limit", Type: openapi.ParamInteger, Required: false, Description: "Max results"},
-	))
-	users.POSTJSON("/users", func(c echolib.Context) error {
+	},
+		echo.WithQueryParams(
+			openapi.QueryParam{Name: "q", Type: openapi.ParamString, Required: true, Description: "Search term"},
+			openapi.QueryParam{Name: "limit", Type: openapi.ParamInteger, Required: false, Description: "Max results"},
+		),
+		echo.JSONRoute(nil, struct{}{}, http.StatusOK)...,
+	)
+
+	users.POST("/users", func(c echolib.Context) error {
 		var in CreateUser
-		if err := c.Bind(&in); err != nil {
-			return echo.JSON(c, http.StatusBadRequest, ErrorResponse{Error: "invalid body"})
+		if err := echo.Bind(c, &in); err != nil || in.Name == "" {
+			_ = echo.JSON(c, http.StatusBadRequest, ErrorResponse{Error: "invalid body"})
+			return nil
 		}
 		return c.NoContent(http.StatusCreated)
-	}, CreateUser{}, struct{}{}, http.StatusCreated)
+	}, echo.JSONRoute(CreateUser{}, struct{}{}, http.StatusCreated)...)
 
 	users.GET("/users/:id", func(c echolib.Context) error {
 		id := c.Param("id")
@@ -59,39 +64,44 @@ func main() {
 			return echo.JSON(c, http.StatusNotFound, ErrorResponse{Error: "user not found"})
 		}
 		return echo.JSON(c, http.StatusOK, User{ID: id, Name: "Alice"})
-	})
+	}, echo.JSONRoute(nil, User{}, http.StatusOK)...)
 
-	users.PUTJSON("/users/:id", func(c echolib.Context) error {
+	users.PUT("/users/:id", func(c echolib.Context) error {
 		id := c.Param("id")
 		var in UpdateUser
-		if err := c.Bind(&in); err != nil {
-			return echo.JSON(c, http.StatusBadRequest, ErrorResponse{Error: "invalid body"})
+		if err := echo.Bind(c, &in); err != nil {
+			_ = echo.JSON(c, http.StatusBadRequest, ErrorResponse{Error: "invalid body"})
+			return nil
 		}
 		if id == "404" {
-			return echo.JSON(c, http.StatusNotFound, ErrorResponse{Error: "user not found"})
+			_ = echo.JSON(c, http.StatusNotFound, ErrorResponse{Error: "user not found"})
+			return nil
 		}
 		return echo.JSON(c, http.StatusOK, User{ID: id, Name: in.Name})
-	}, UpdateUser{}, User{}, http.StatusOK)
+	}, echo.JSONRoute(UpdateUser{}, User{}, http.StatusOK)...)
 
-	users.PATCHJSON("/users/:id", func(c echolib.Context) error {
+	users.PATCH("/users/:id", func(c echolib.Context) error {
 		id := c.Param("id")
 		var in UpdateUser
-		if err := c.Bind(&in); err != nil {
-			return echo.JSON(c, http.StatusBadRequest, ErrorResponse{Error: "invalid body"})
+		if err := echo.Bind(c, &in); err != nil {
+			_ = echo.JSON(c, http.StatusBadRequest, ErrorResponse{Error: "invalid body"})
+			return nil
 		}
 		if id == "404" {
-			return echo.JSON(c, http.StatusNotFound, ErrorResponse{Error: "user not found"})
+			_ = echo.JSON(c, http.StatusNotFound, ErrorResponse{Error: "user not found"})
+			return nil
 		}
 		return echo.JSON(c, http.StatusOK, User{ID: id, Name: in.Name})
-	}, UpdateUser{}, User{}, http.StatusOK)
+	}, echo.JSONRoute(UpdateUser{}, User{}, http.StatusOK)...)
 
-	users.DELETEJSON("/users/:id", func(c echolib.Context) error {
+	users.DELETE("/users/:id", func(c echolib.Context) error {
 		id := c.Param("id")
 		if id == "404" {
-			return echo.JSON(c, http.StatusNotFound, ErrorResponse{Error: "user not found"})
+			_ = echo.JSON(c, http.StatusNotFound, ErrorResponse{Error: "user not found"})
+			return nil
 		}
 		return c.NoContent(http.StatusNoContent)
-	}, struct{}{}, http.StatusNoContent)
+	}, echo.JSONRoute(nil, struct{}{}, http.StatusNoContent)...)
 
 	echo.Register(r, openapi.Config{
 		Title:   "User API",

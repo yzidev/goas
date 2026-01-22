@@ -50,7 +50,12 @@ func main() {
 			return c.NoContent(http.StatusUnauthorized)
 		}
 		return c.NoContent(http.StatusCreated)
-	}, echo.WithSecurity(&apiKey), echo.JSONRoute(nil, struct{}{}, http.StatusCreated)...)
+	},
+		append(
+			[]echo.HandlerOption{echo.WithSecurity(&apiKey)},
+			echo.JSONRoute(nil, struct{}{}, http.StatusCreated)...,
+		)...,
+	)
 
 	echo.Register(r, cfg)
 	_ = r.Echo.Start(":8080")

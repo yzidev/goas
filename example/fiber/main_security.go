@@ -43,12 +43,17 @@ func main() {
 		return fiber.JSON(c, http.StatusOK, []SecUser{{ID: "1", Name: "Alice"}})
 	}, fiber.WithSecurity(&bearer))
 
-	secure.POSTJSON("/secure/users", func(c *fiberlib.Ctx) error {
+	secure.POST("/secure/users", func(c *fiberlib.Ctx) error {
 		if c.Get("X-API-Key") == "" {
 			return c.SendStatus(http.StatusUnauthorized)
 		}
 		return c.SendStatus(http.StatusCreated)
-	}, nil, struct{}{}, http.StatusCreated, fiber.WithSecurity(&apiKey))
+	},
+		append(
+			[]fiber.HandlerOption{fiber.WithSecurity(&apiKey)},
+			fiber.JSONRoute(nil, struct{}{}, http.StatusCreated)...,
+		)...,
+	)
 
 	fiber.Register(r, cfg)
 	_ = r.App.Listen(":8080")

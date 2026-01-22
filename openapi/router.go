@@ -29,6 +29,11 @@ type Router struct {
 	routes []RouteMeta
 }
 
+// Get registers a plain GET handler (used by Swagger UI mount helpers).
+func (r *Router) Get(path string, h http.HandlerFunc) {
+	r.Mux.MethodFunc(http.MethodGet, path, h)
+}
+
 func NewRouter() *Router {
 	return &Router{
 		Mux: chi.NewRouter(),

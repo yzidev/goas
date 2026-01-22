@@ -21,6 +21,10 @@ func WriteSwaggerUIHTML(w io.Writer, cfg SwaggerUIConfig) {
 		mount = "/" + mount
 	}
 	mount = strings.TrimSuffix(mount, "/")
+	ver := cfg.Version
+	if ver == "" {
+		ver = "1"
+	}
 
-	_ = swaggerUITpl.Execute(w, map[string]any{"SpecURL": spec, "MountPath": mount})
+	_ = swaggerUITpl.Execute(w, map[string]any{"SpecURL": spec, "MountPath": mount, "Version": ver})
 }

@@ -1,5 +1,7 @@
 # OpenAPIGO
 
+[![CI](https://github.com/aizacoders/openapigo/actions/workflows/ci.yml/badge.svg)](https://github.com/aizacoders/openapigo/actions/workflows/ci.yml)
+
 Auto-generate **OpenAPI 3.x** from your Go route registrations.
 
 The goal is to keep your routing code **clean** (plain `GET/POST/PUT/PATCH/DELETE`) while still producing a good OpenAPI spec + Swagger UI.

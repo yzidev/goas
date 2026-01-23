@@ -2,15 +2,21 @@
 
 This repo uses a **config-first** style (SpringBoot-like): keep routes/handlers clean, and declare OpenAPI metadata in one place using `openapi/simple`.
 
-## Run
+## Quick start
 
-Non-security:
+Install (if you don't already have Gin):
+
+```bash
+go get github.com/gin-gonic/gin@latest
+```
+
+Run the example:
 
 ```bash
 go run ./example/gin
 ```
 
-Security (Bearer + X-API-Key):
+Use `-tags "security"` only when running the security variant:
 
 ```bash
 go run -tags "security" ./example/gin
@@ -24,45 +30,102 @@ OpenAPI JSON:
 
 - http://localhost:8080/openapi.json
 
-## What to look at
+---
 
-- Routing (clean):
-  - `example/gin/routes.go`
-  - `example/gin/routes_security.go`
-- Handlers (separated):
-  - `example/gin/handlers_*.go`
+## Implementation details (step-by-step)
 
-## Upload file (multipart/form-data)
+This section shows how to wire Gin with OpenAPIGO in your own project.
 
-Endpoint:
-- `POST /users/upload` (non-security)
-- `POST /secure/users/upload` (security)
-
-In the spec config it’s defined with:
+1) Imports
 
 ```go
-s.POST("/users/upload").MultipartUpload(
-  "file",
-  openapi.MultipartField{Name: "note", Type: openapi.ParamString},
-).Res(map[string]string{}).OK()
+import (
+    ginlib "github.com/gin-gonic/gin"
+    ginadapter "github.com/aizacoders/openapigo/adapters/gin"
+    "github.com/aizacoders/openapigo/openapi"
+    "github.com/aizacoders/openapigo/openapi/simple"
+)
 ```
 
-In Swagger UI you should see:
-- `file` input as file upload
-- `note` as text input
-- requestBody content type: `multipart/form-data`
+2) Create your Gin engine (you can customize middleware, logger, etc.)
 
-## Security
+```go
+engine := ginlib.Default()      // or ginlib.New()
+```
 
-Security demo uses two schemes:
-- Bearer token (`Authorization: Bearer <token>`)
-- API key (`X-API-Key: <key>`)
+3) Wrap the engine with the adapter so OpenAPIGO can capture route metadata
 
-See:
-- `example/gin/main_security.go`
-- `example/gin/routes_security.go`
+```go
+adapter := ginadapter.NewFromEngine(engine)
+```
 
-## Notes
+4) Build your Spec using the simple builder (grouping + tags)
 
-- Examples now use the adapter `NewFromEngine` pattern so you can initialize your Gin engine as usual (e.g., `gin.New()` or `gin.Default()`) and then wrap it with the adapter before registering OpenAPI.
-- Response error schemas are auto-included via default error responses in `openapi.Config` (unless disabled).
+```go
+b := simple.NewSpec()
+b.GroupTags("/", []string{"Users"}, func(s *simple.SpecBuilder) {
+    s.GET("/users").Res([]User{}).OK()
+    s.POST("/users").Req(CreateUser{}).Res(User{}).Created()
+    // Multipart upload
+    s.POST("/users/upload").MultipartUpload("file", openapi.MultipartField{Name: "note", Type: openapi.ParamString}).Res(map[string]string{}).OK()
+    // Errors and extra responses
+    s.GET("/users/demo-errors").Res(map[string]string{}).OK().Responses(
+        openapi.ResponseSpec{Status: 400, Schema: openapi.ErrorResponse{}},
+        openapi.ResponseSpec{Status: 401, Schema: openapi.ErrorResponse{}},
+        openapi.ResponseSpec{Status: 500, Schema: openapi.ErrorResponse{}},
+    )
+})
+spec := b.Spec()
+```
+
+5) Create the `simple` router that injects Spec defaults
+
+```go
+sr := simple.NewGin(adapter, spec)
+```
+
+6) Register handlers using the clean API (methods only)
+
+```go
+sr.GET("/users", func(c *ginlib.Context) {
+    // use adapter helpers
+    ginadapter.JSON(c, 200, []User{{ID: "1", Name: "Alice"}})
+})
+```
+
+7) Mount OpenAPI JSON + Swagger UI and run
+
+```go
+adapter.Register(adapter, openapi.Config{Title: "User API", Version: "1.0.0"})
+adapter.Engine.Run(":8080")
+```
+
+8) Security (optional)
+
+- Define schemes in `openapi.Config.SecuritySchemes` and attach per-route via `RouteBuilder.Security`.
+
+Example:
+
+```go
+bearer := &openapi3.SecurityScheme{Type: "http", Scheme: "bearer", BearerFormat: "JWT"}
+apiKey := &openapi3.SecurityScheme{Type: "apiKey", In: "header", Name: "X-API-Key"}
+cfg := openapi.Config{Title: "API", Version: "1.0.0", SecuritySchemes: map[string]*openapi3.SecuritySchemeRef{
+    "bearer": {Value: bearer},
+    "xapikey": {Value: apiKey},
+}}
+// Attach per-route in builder:
+// s.GET("/secure").Security(&openapi3.SecurityRequirement{"bearer": {}}).Res(...).OK()
+```
+
+9) Troubleshooting
+
+- If you get type errors around New/NewFromEngine: make sure you import Gin framework (github.com/gin-gonic/gin) and adapter package separately (use aliases to avoid name collisions: `ginlib` vs `ginadapter`).
+- If Swagger UI doesn't show request/response schemas: ensure you declared Req/Res in the Spec builder; `simple` injects those into routes.
+
+---
+
+## What to inspect in this repo
+
+- `example/gin/main.go` — demonstrates wrapping an existing engine and registering OpenAPI
+- `example/gin/routes.go` — shows clean route declarations
+- `openapi/simple` — the spec builder API used to declare schemas and responses

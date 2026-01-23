@@ -41,7 +41,7 @@ func openAPICfg() openapi.Config {
 	}
 }
 
-func springSpec() simple.Spec {
+func openapiSpec() simple.Spec {
 	b := simple.NewSpec()
 	b.GroupTags("", []string{"System"}, func(s *simple.SpecBuilder) {
 		s.GET("/healthz").Res(map[string]string{}).OK()

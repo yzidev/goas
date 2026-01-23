@@ -31,7 +31,7 @@ func main() {
 	// wrap existing engine into adapter router so OpenAPI metadata is captured
 	r := ginadapter.NewFromEngine(engine)
 
-	sr := simple.NewGin(r, springSpec())
+	sr := simple.NewGin(r, openapiSpec())
 
 	registerSystemRoutes(sr)
 	registerUserRoutes(sr)

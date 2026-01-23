@@ -31,7 +31,7 @@ type CreateUser struct {
 }
 
 func main() {
-	base := echo.New()
+	base := echolib.New()
 
 	b := simple.NewSpec()
 	b.GroupTags("", []string{"Users"}, func(s *simple.SpecBuilder) {
@@ -53,8 +53,11 @@ func main() {
 
 	spec := b.Spec()
 
-	r := simple.NewEcho(base, spec)
-	users := r.Group("", echo.WithTags("Users"))
+	// wrap the existing echo instance into the adapter
+	r := echo.NewFromEcho(base)
+
+	sr := simple.NewEcho(r, spec)
+	users := sr.Group("", echo.WithTags("Users"))
 
 	users.GET("/users", func(c echolib.Context) error {
 		return echo.JSON(c, http.StatusOK, []User{{ID: "1", Name: "Alice"}})
@@ -129,10 +132,10 @@ func main() {
 		return c.NoContent(http.StatusNoContent)
 	})
 
-	echo.Register(base, openapi.Config{
+	echo.Register(r, openapi.Config{
 		Title:   "User API",
 		Version: "1.0.0",
 		Tags:    openapi3.Tags{{Name: "Users", Description: "User management endpoints"}},
 	})
-	_ = base.Echo.Start(":8080")
+	_ = r.Echo.Start(":8080")
 }

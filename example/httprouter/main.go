@@ -5,6 +5,7 @@ package main
 import (
 	"net/http"
 
+	"github.com/aizacoders/openapigo/adapters/httprouter"
 	"github.com/aizacoders/openapigo/openapi"
 	"github.com/aizacoders/openapigo/openapi/simple"
 	"github.com/getkin/kin-openapi/openapi3"
@@ -28,7 +29,7 @@ type CreateUser struct {
 }
 
 func main() {
-	base := openapi.NewRouter()
+	base := httprouter.New()
 
 	b := simple.NewSpec()
 	b.GroupTags("", []string{"Users"}, func(s *simple.SpecBuilder) {
@@ -130,7 +131,7 @@ func main() {
 		w.WriteHeader(http.StatusNoContent)
 	})
 
-	openapi.Register(base, openapi.Config{
+	httprouter.Register(base, openapi.Config{
 		Title:   "User API",
 		Version: "1.0.0",
 		Tags: openapi3.Tags{

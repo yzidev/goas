@@ -3,8 +3,9 @@
 package main
 
 import (
-	"github.com/aizacoders/openapigo/adapters/gin"
+	ginadapter "github.com/aizacoders/openapigo/adapters/gin"
 	"github.com/aizacoders/openapigo/openapi/simple"
+	ginlib "github.com/gin-gonic/gin"
 )
 
 type User struct {
@@ -25,13 +26,16 @@ type ErrorResponse struct {
 }
 
 func main() {
-	r := gin.New()
+	engine := ginlib.New()
 
-	sr := simple.NewGin(r, springSpec())
+	// wrap existing engine into adapter router so OpenAPI metadata is captured
+	r := ginadapter.NewFromEngine(engine)
+
+	sr := simple.NewGin(r, openapiSpec())
 
 	registerSystemRoutes(sr)
 	registerUserRoutes(sr)
 
-	gin.Register(r, openAPICfg())
+	ginadapter.Register(r, openAPICfg())
 	_ = r.Engine.Run(":8080")
 }

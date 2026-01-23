@@ -2,51 +2,84 @@
 
 This example shows the **config-first** (SpringBoot-like) way to use OpenAPIGO with Echo.
 
-## Run
+## Quick start
 
-Non-security:
-
-```bash
-go run -tags echo ./example/echo
-```
-
-Security (Bearer + X-API-Key):
+Install Echo if you don't have it:
 
 ```bash
-go run -tags "echo,security" ./example/echo
+go get github.com/labstack/echo/v4@latest
 ```
 
-Swagger UI:
+Run the example:
+
+```bash
+go run ./example/echo
+```
+
+Use `-tags "security"` only when running the security variant:
+
+```bash
+go run -tags "security" ./example/echo
+```
+
+Open Swagger UI:
+
 - http://localhost:8080/swagger-ui/index.html#/
 
 OpenAPI JSON:
+
 - http://localhost:8080/openapi.json
 
-## Code structure
+---
 
-- Spec definition (grouped):
-  - `example/echo/main.go`
-  - `example/echo/main_security.go`
-- Routes + handlers: contained in the same file for Echo examples, but handlers are still separated as functions.
+## Implementation details (step-by-step)
 
-## Upload file
-
-Endpoint:
-- `POST /users/upload`
-- `POST /secure/users/upload` (security)
-
-Spec uses:
+1) Imports
 
 ```go
-s.POST("/users/upload").MultipartUpload(
-  "file",
-  openapi.MultipartField{Name: "note", Type: openapi.ParamString},
-).Res(map[string]string{}).OK()
+import (
+    echolib "github.com/labstack/echo/v4"
+    echoadapter "github.com/aizacoders/openapigo/adapters/echo"
+    "github.com/aizacoders/openapigo/openapi"
+    "github.com/aizacoders/openapigo/openapi/simple"
+)
 ```
 
-## Security
+2) Create Echo instance and wrap with adapter
 
-- Bearer: `Authorization: Bearer <token>`
-- API key: `X-API-Key: <key>`
+```go
+base := echolib.New()
+adapter := echoadapter.NewFromEcho(base)
+```
 
-The security examples also include `/secure/demo-errors` for quick error-response preview.
+3) Build Spec with `simple.NewSpec()` (group routes, define Req/Res and multipart)
+
+```go
+b := simple.NewSpec()
+b.GroupTags("/", []string{"Users"}, func(s *simple.SpecBuilder) {
+    s.GET("/users").Res([]User{}).OK()
+    s.POST("/users").Req(CreateUser{}).Res(User{}).Created()
+})
+```
+
+4) Create the simple wrapper and register handlers
+
+```go
+sr := simple.NewEcho(adapter, b.Spec())
+users := sr.Group("", echoadapter.WithTags("Users"))
+users.GET("/users", func(c echolib.Context) error {
+    return echoadapter.JSON(c, http.StatusOK, []User{{ID: "1", Name: "Alice"}})
+})
+```
+
+5) Mount OpenAPI and run
+
+```go
+adapter.Register(adapter, openapi.Config{Title: "User API", Version: "1.0.0"})
+adapter.Echo.Start(":8080")
+```
+
+6) Notes
+
+- `NewFromEcho` lets you create middleware and configure the Echo instance before wrapping it with the adapter.
+- Use `MultipartUpload` in the Spec builder to expose file upload inputs in Swagger UI.

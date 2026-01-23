@@ -1,5 +1,3 @@
-//go:build echo
-
 package echo
 
 import (
@@ -20,6 +18,15 @@ type Router struct {
 
 func New() *Router {
 	return &Router{Echo: echolib.New()}
+}
+
+// NewFromEcho wraps an existing *echo.Echo into the adapter Router so callers
+// who create their own echo server (e.g., echo.New() or echo.Default()) can use the adapter.
+func NewFromEcho(e *echolib.Echo) *Router {
+	if e == nil {
+		e = echolib.New()
+	}
+	return &Router{Echo: e}
 }
 
 type HandlerOption = openapi.HandlerOption

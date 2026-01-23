@@ -1,5 +1,3 @@
-//go:build gin
-
 package simple
 
 import (

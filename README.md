@@ -1,5 +1,7 @@
 # OpenAPIGO
 
+[![CI](https://github.com/aizacoders/openapigo/actions/workflows/ci.yml/badge.svg)](https://github.com/aizacoders/openapigo/actions/workflows/ci.yml)
+
 Auto-generate **OpenAPI 3.x** from your Go route registrations.
 
 The goal is to keep your routing code **clean** (plain `GET/POST/PUT/PATCH/DELETE`) while still producing a good OpenAPI spec + Swagger UI.
@@ -147,13 +149,16 @@ Run examples and open Swagger UI:
 OpenAPIGO is currently focused on **4 frameworks/router setups**:
 
 1. **net/http (built-in `openapi.Router` based on chi)**
-2. **Gin** (build tag: `gin`)
-3. **Echo** (build tag: `echo`)
-4. **Fiber** (build tag: `fiber`)
+2. **Gin**
+3. **Echo**
+4. **Fiber**
 
 Notes:
 - Other frameworks may be added later, but the repo intentionally stays small and dependency-light.
-- Adapters are behind build tags so you can use the core package without pulling extra dependencies.
+- Adapters are provided as packages under `adapters/*` so you can use them when needed.
+  They are compiled by default and no special build tags are required to use them.
+  If you prefer to keep adapter dependencies optional for your project, consider
+  shipping adapters as separate modules (e.g. `github.com/aizacoders/openapigo-adapter-gin`) so downstream projects opt-in.
 
 ---
 
@@ -213,6 +218,77 @@ For a starting point, check:
 - `adapters/gin`
 - `adapters/echo`
 - `adapters/fiber`
+
+---
+
+## Adapters (how to use with frameworks)
+
+OpenAPIGO provides lightweight adapters for multiple frameworks so you can keep your
+handler code clean while still generating OpenAPI and mounting Swagger UI.
+
+Pattern (recommended):
+
+1. Create your framework engine/app (e.g., `gin`, `echo`, `fiber`).
+2. Wrap it with the adapter `NewFrom*` helper (so the adapter captures route metadata).
+3. Create the `simple` wrapper using the adapter and your `Spec`.
+4. Register OpenAPI via the adapter `Register` helper and run the engine/app.
+
+Examples:
+
+- Gin
+
+```go
+import (
+    ginlib "github.com/gin-gonic/gin"
+    ginadapter "github.com/aizacoders/openapigo/adapters/gin"
+    "github.com/aizacoders/openapigo/openapi/simple"
+)
+
+engine := ginlib.New()
+adapter := ginadapter.NewFromEngine(engine)
+sr := simple.NewGin(adapter, mySpec)
+// register routes on sr ...
+ginadapter.Register(adapter, openapi.Config{Title: "My API", Version: "0.1.0"})
+adapter.Engine.Run(":8080")
+```
+
+- Echo
+
+```go
+import (
+    echolib "github.com/labstack/echo/v4"
+    echoadapter "github.com/aizacoders/openapigo/adapters/echo"
+    "github.com/aizacoders/openapigo/openapi/simple"
+)
+
+base := echolib.New()
+adapter := echoadapter.NewFromEcho(base)
+sr := simple.NewEcho(adapter, mySpec)
+// register routes on sr ...
+echoadapter.Register(adapter, openapi.Config{Title: "My API", Version: "0.1.0"})
+adapter.Echo.Start(":8080")
+```
+
+- Fiber
+
+```go
+import (
+    fiberlib "github.com/gofiber/fiber/v2"
+    fiberadapter "github.com/aizacoders/openapigo/adapters/fiber"
+    "github.com/aizacoders/openapigo/openapi/simple"
+)
+
+app := fiberlib.New()
+adapter := fiberadapter.NewFromApp(app)
+sr := simple.NewFiber(adapter, mySpec)
+// register routes on sr ...
+fiberadapter.Register(adapter, openapi.Config{Title: "My API", Version: "0.1.0"})
+adapter.App.Listen(":8080")
+```
+
+Notes:
+- The `NewFrom*` helpers let you keep your preferred engine/app initialization (e.g., `gin.Default()`), while still enabling OpenAPIGO to capture route metadata.
+- If you previously built with `-tags`, adapters are now compiled by default — no need to use build tags to get adapter implementations.
 
 ---
 

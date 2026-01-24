@@ -21,7 +21,7 @@ type EchoGroup struct {
 	r      *EchoRouter
 }
 
-func NewEcho(base *echoadapter.Router, spec Spec) *EchoRouter {
+func NewEchoRouter(base *echoadapter.Router, spec Spec) *EchoRouter {
 	return &EchoRouter{Base: base, Spec: spec}
 }
 

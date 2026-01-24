@@ -29,7 +29,7 @@ func TestDefaultErrorResponsesIncludedEvenWithCustomSuccessStatuses(t *testing.T
 		s.POST("/secure/users").Security(&bearer).Res(struct{}{}).Created()
 	})
 
-	r := NewGin(base, b.Spec())
+	r := NewGinRouter(base, b.Spec())
 	r.POST("/secure/users", func(c *ginlib.Context) {})
 
 	doc := openapi.BuildSpec(r.Routes(), openapi.Config{Title: "T", Version: "1"})

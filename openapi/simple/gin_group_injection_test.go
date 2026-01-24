@@ -33,7 +33,7 @@ func TestGinGroupKeepsSpecInjection(t *testing.T) {
 		},
 	}
 
-	r := NewGin(base, spec)
+	r := NewGinRouter(base, spec)
 	grp := r.Group("", ginadapter.WithTags("Users"))
 	grp.POST("/users", func(c *ginlib.Context) {})
 

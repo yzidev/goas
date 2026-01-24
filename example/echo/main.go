@@ -55,10 +55,9 @@ func main() {
 
 	// wrap the existing echo instance into the adapter
 	r := echo.NewEchoAdapters(base)
+	sr := simple.NewEchoRouter(r, spec)
 
-	sr := simple.NewEcho(r, spec)
 	users := sr.Group("", echo.WithTags("Users"))
-
 	users.GET("/users", func(c echolib.Context) error {
 		return echo.JSON(c, http.StatusOK, []User{{ID: "1", Name: "Alice"}})
 	})

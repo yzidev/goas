@@ -55,10 +55,9 @@ func main() {
 
 	// wrap existing fiber App into adapter
 	r := fiber.NewFiberAdapters(base)
+	sr := simple.NewFiberRouter(r, spec)
 
-	sr := simple.NewFiber(r, spec)
 	users := sr.Group("", fiber.WithTags("Users"))
-
 	users.GET("/users", func(c *fiberlib.Ctx) error {
 		return fiber.JSON(c, http.StatusOK, []User{{ID: "1", Name: "Alice"}})
 	})

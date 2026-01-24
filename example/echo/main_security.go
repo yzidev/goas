@@ -47,7 +47,7 @@ func main() {
 
 	spec := b.Spec()
 
-	r := simple.NewEcho(base, spec)
+	r := simple.NewEchoRouter(base, spec)
 	secure := r.Group("", echo.WithTags("Secure Users"))
 
 	secure.GET("/secure/users", func(c echolib.Context) error {

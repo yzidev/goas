@@ -21,7 +21,7 @@ type FiberGroup struct {
 	r      *FiberRouter
 }
 
-func NewFiber(base *fiberadapter.Router, spec Spec) *FiberRouter {
+func NewFiberRouter(base *fiberadapter.Router, spec Spec) *FiberRouter {
 	return &FiberRouter{Base: base, Spec: spec}
 }
 

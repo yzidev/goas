@@ -22,7 +22,7 @@ type GinGroup struct {
 	r      *GinRouter
 }
 
-func NewGin(base *ginadapter.Router, spec Spec) *GinRouter {
+func NewGinRouter(base *ginadapter.Router, spec Spec) *GinRouter {
 	return &GinRouter{Base: base, Spec: spec}
 }
 

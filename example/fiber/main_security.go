@@ -48,7 +48,7 @@ func main() {
 
 	spec := b.Spec()
 
-	r := simple.NewFiber(base, spec)
+	r := simple.NewFiberRouter(base, spec)
 	secure := r.Group("", fiber.WithTags("Secure Users"))
 
 	secure.GET("/secure/users", func(c *fiberlib.Ctx) error {

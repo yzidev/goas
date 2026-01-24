@@ -209,11 +209,10 @@ func openapiSpec() simple.Spec {
 
 func main() {
 	mux := http.NewServeMux()
-	base := httprouter.New(mux)
 
-	// build OpenAPI spec using helper
-	spec := openapiSpec()
-	r := simple.New(base, spec)
+	// Router setup by openapigo/httprouter adapter
+	base := httprouter.NewHttpAdapters(mux)
+	r := simple.NewHttpRouter(base, openapiSpec())
 
 	// Clean routes: just HTTP methods + handlers.
 	users := r.Group("/api/v1.0", openapi.WithTags("Users"))

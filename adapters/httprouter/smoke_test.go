@@ -7,7 +7,7 @@ import (
 )
 
 func TestHTTPRouterNew(t *testing.T) {
-	r := New()
+	r := NewHttpAdapters()
 	if r == nil {
 		t.Fatalf("New() returned nil")
 	}

@@ -33,7 +33,7 @@ func TestErrorResponseSchemasAppearInComponents(t *testing.T) {
 		},
 	}
 
-	r := NewGin(base, spec)
+	r := NewGinRouter(base, spec)
 	r.GET("/users/demo-errors", func(c *ginlib.Context) {})
 
 	doc := openapi.BuildSpec(r.Routes(), openapi.Config{Title: "T", Version: "1"})

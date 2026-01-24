@@ -12,10 +12,10 @@ import (
 // Later we can make openapi core framework-agnostic and keep the net/http router here.
 type Router = openapi.Router
 
-// New creates a new adapter Router. If an *http.ServeMux is provided it will
+// NewHttpAdapters creates a new adapter Router. If an *http.ServeMux is provided it will
 // automatically mount the created router on the mux under the root path "/",
-// so callers can call `base := httprouter.New(mux)` and skip `mux.Handle("/", r)`.
-func New(mux ...*http.ServeMux) *Router {
+// so callers can call `base := httprouter.NewHttpAdapters(mux)` and skip `mux.Handle("/", r)`.
+func NewHttpAdapters(mux ...*http.ServeMux) *Router {
 	r := openapi.NewRouter()
 	if len(mux) > 0 && mux[0] != nil {
 		mux[0].Handle("/", r)

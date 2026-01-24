@@ -15,7 +15,7 @@ func TestMultipartUploadHelperProducesMultipartFormData(t *testing.T) {
 		s.POST("/upload").MultipartUpload("file", openapi.MultipartField{Name: "note", Type: openapi.ParamString}).Res(map[string]string{}).OK()
 	})
 
-	r := New(base, b.Spec())
+	r := NewHttpRouter(base, b.Spec())
 	r.POST("/upload", func(w http.ResponseWriter, r *http.Request) {})
 
 	doc := openapi.BuildSpec(base.Routes(), openapi.Config{Title: "T", Version: "1"})

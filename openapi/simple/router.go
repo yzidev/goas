@@ -13,7 +13,7 @@ type Router struct {
 	Spec Spec
 }
 
-func New(base *openapi.Router, spec Spec) *Router {
+func NewHttpRouter(base *openapi.Router, spec Spec) *Router {
 	return &Router{Base: base, Spec: spec}
 }
 

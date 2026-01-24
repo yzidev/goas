@@ -17,7 +17,7 @@ func main() {
 
 	cfg, bearer, apiKey := openAPICfgSecurity()
 
-	sr := simple.NewGin(r, simple.Spec{})
+	sr := simple.NewGinRouter(r, simple.Spec{})
 	registerSecureRoutes(sr, bearer, apiKey)
 
 	gin.Register(r, cfg)

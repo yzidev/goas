@@ -87,3 +87,4 @@ adapter.Echo.Start(":8080")
 ### Note about core router
 
 The OpenAPIGO core router is a lightweight net/http-backed mux. Adapter packages (including Echo) integrate with this core behavior and continue to work as before. If you use the `httprouter` adapter you can optionally mount the router automatically onto a `*http.ServeMux` by calling `httprouter.New(mux)`.
+

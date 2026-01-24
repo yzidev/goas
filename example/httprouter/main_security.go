@@ -49,7 +49,7 @@ func main() {
 
 	spec := b.Spec()
 
-	r := simple.New(base, spec)
+	r := simple.NewHttpRouter(base, spec)
 	secure := r.Group("", openapi.WithTags("Secure Users"))
 
 	// Bearer-protected endpoint

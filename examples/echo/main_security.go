@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/aizacoders/openapigo/adapters/echoadapter"
 	"github.com/getkin/kin-openapi/openapi3"
 	echolib "github.com/labstack/echo/v4"
 
-	"github.com/aizacoders/openapigo/adapters/echo"
 	"github.com/aizacoders/openapigo/openapi"
 	"github.com/aizacoders/openapigo/openapi/oas"
 )
@@ -20,7 +20,7 @@ type SecUser struct {
 }
 
 func main() {
-	base := echo.New()
+	base := echoadapter.New()
 
 	cfg := openapi.Config{
 		Title:   "User API (Echo + Security)",
@@ -48,14 +48,14 @@ func main() {
 	spec := b.Spec()
 
 	r := oas.NewEchoRouter(base, spec)
-	secure := r.Group("", echo.WithTags("Secure Users"))
+	secure := r.Group("", echoadapter.WithTags("Secure Users"))
 
 	secure.GET("/secure/users", func(c echolib.Context) error {
 		auth := c.Request().Header.Get("Authorization")
 		if !strings.HasPrefix(auth, "Bearer ") {
 			return c.NoContent(http.StatusUnauthorized)
 		}
-		return echo.JSON(c, http.StatusOK, []SecUser{{ID: "1", Name: "Alice"}})
+		return echoadapter.JSON(c, http.StatusOK, []SecUser{{ID: "1", Name: "Alice"}})
 	})
 
 	secure.POST("/secure/users", func(c echolib.Context) error {
@@ -67,33 +67,33 @@ func main() {
 
 	secure.POST("/secure/users/upload", func(c echolib.Context) error {
 		if c.Request().Header.Get("X-API-Key") == "" {
-			return echo.JSON(c, http.StatusUnauthorized, openapi.ErrorResponse{Error: "unauthorized"})
+			return echoadapter.JSON(c, http.StatusUnauthorized, openapi.ErrorResponse{Error: "unauthorized"})
 		}
 		f, err := c.FormFile("file")
 		if err != nil {
-			return echo.JSON(c, http.StatusBadRequest, openapi.ErrorResponse{Error: "missing file"})
+			return echoadapter.JSON(c, http.StatusBadRequest, openapi.ErrorResponse{Error: "missing file"})
 		}
 		note := c.FormValue("note")
-		return echo.JSON(c, http.StatusOK, map[string]string{"filename": f.Filename, "note": note})
+		return echoadapter.JSON(c, http.StatusOK, map[string]string{"filename": f.Filename, "note": note})
 	})
 
 	secure.GET("/secure/demo-errors", func(c echolib.Context) error {
 		auth := c.Request().Header.Get("Authorization")
 		if !strings.HasPrefix(auth, "Bearer ") {
-			return echo.JSON(c, http.StatusUnauthorized, openapi.ErrorResponse{Error: "unauthorized"})
+			return echoadapter.JSON(c, http.StatusUnauthorized, openapi.ErrorResponse{Error: "unauthorized"})
 		}
 		switch c.QueryParam("code") {
 		case "400":
-			return echo.JSON(c, http.StatusBadRequest, openapi.ErrorResponse{Error: "bad request"})
+			return echoadapter.JSON(c, http.StatusBadRequest, openapi.ErrorResponse{Error: "bad request"})
 		case "500":
-			return echo.JSON(c, http.StatusInternalServerError, openapi.ErrorResponse{Error: "internal error"})
+			return echoadapter.JSON(c, http.StatusInternalServerError, openapi.ErrorResponse{Error: "internal error"})
 		case "503":
-			return echo.JSON(c, http.StatusServiceUnavailable, openapi.ErrorResponse{Error: "service unavailable"})
+			return echoadapter.JSON(c, http.StatusServiceUnavailable, openapi.ErrorResponse{Error: "service unavailable"})
 		default:
-			return echo.JSON(c, http.StatusOK, map[string]string{"status": "ok"})
+			return echoadapter.JSON(c, http.StatusOK, map[string]string{"status": "ok"})
 		}
 	})
 
-	echo.Register(base, cfg)
+	echoadapter.Register(base, cfg)
 	_ = base.Echo.Start(":8080")
 }

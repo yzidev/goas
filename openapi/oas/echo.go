@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	echoadapter "github.com/aizacoders/openapigo/adapters/echo"
+	"github.com/aizacoders/openapigo/adapters/echoadapter"
 	"github.com/aizacoders/openapigo/openapi"
 	echolib "github.com/labstack/echo/v4"
 )

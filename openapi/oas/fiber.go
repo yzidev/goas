@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	fiberadapter "github.com/aizacoders/openapigo/adapters/fiber"
+	"github.com/aizacoders/openapigo/adapters/fiberadapter"
 	"github.com/aizacoders/openapigo/openapi"
 	fiberlib "github.com/gofiber/fiber/v2"
 )

@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	ginadapter "github.com/aizacoders/openapigo/adapters/gin"
+	"github.com/aizacoders/openapigo/adapters/ginadapter"
 	"github.com/aizacoders/openapigo/openapi"
 	ginlib "github.com/gin-gonic/gin"
 )

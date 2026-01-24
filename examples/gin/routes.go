@@ -5,7 +5,7 @@ package main
 import (
 	"github.com/getkin/kin-openapi/openapi3"
 
-	"github.com/aizacoders/openapigo/adapters/gin"
+	"github.com/aizacoders/openapigo/adapters/ginadapter"
 	"github.com/aizacoders/openapigo/openapi"
 	"github.com/aizacoders/openapigo/openapi/oas"
 )
@@ -18,7 +18,7 @@ func registerSystemRoutes(r *oas.GinRouter) {
 }
 
 func registerUserRoutes(r *oas.GinRouter) {
-	users := r.Group("", gin.WithTags("Users"))
+	users := r.Group("", ginadapter.WithTags("Users"))
 
 	users.GET("/users", handleListUsers)
 	users.GET("/search", handleSearchUsers)

@@ -9,7 +9,7 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 	fiberlib "github.com/gofiber/fiber/v2"
 
-	"github.com/aizacoders/openapigo/adapters/fiber"
+	"github.com/aizacoders/openapigo/adapters/fiberadapter"
 	"github.com/aizacoders/openapigo/openapi"
 	"github.com/aizacoders/openapigo/openapi/oas"
 )
@@ -20,7 +20,7 @@ type SecUser struct {
 }
 
 func main() {
-	base := fiber.New()
+	base := fiberadapter.New()
 
 	cfg := openapi.Config{
 		Title:   "User API (Fiber + Security)",
@@ -49,14 +49,14 @@ func main() {
 	spec := b.Spec()
 
 	r := oas.NewFiberRouter(base, spec)
-	secure := r.Group("", fiber.WithTags("Secure Users"))
+	secure := r.Group("", fiberadapter.WithTags("Secure Users"))
 
 	secure.GET("/secure/users", func(c *fiberlib.Ctx) error {
 		auth := c.Get("Authorization")
 		if !strings.HasPrefix(auth, "Bearer ") {
 			return c.SendStatus(http.StatusUnauthorized)
 		}
-		return fiber.JSON(c, http.StatusOK, []SecUser{{ID: "1", Name: "Alice"}})
+		return fiberadapter.JSON(c, http.StatusOK, []SecUser{{ID: "1", Name: "Alice"}})
 	})
 
 	secure.POST("/secure/users", func(c *fiberlib.Ctx) error {
@@ -68,14 +68,14 @@ func main() {
 
 	secure.POST("/secure/users/upload", func(c *fiberlib.Ctx) error {
 		if c.Get("X-API-Key") == "" {
-			return fiber.JSON(c, http.StatusUnauthorized, openapi.ErrorResponse{Error: "unauthorized"})
+			return fiberadapter.JSON(c, http.StatusUnauthorized, openapi.ErrorResponse{Error: "unauthorized"})
 		}
 		fh, err := c.FormFile("file")
 		if err != nil {
-			return fiber.JSON(c, http.StatusBadRequest, openapi.ErrorResponse{Error: "missing file"})
+			return fiberadapter.JSON(c, http.StatusBadRequest, openapi.ErrorResponse{Error: "missing file"})
 		}
 		note := c.FormValue("note")
-		return fiber.JSON(c, http.StatusOK, map[string]string{"filename": fh.Filename, "note": note})
+		return fiberadapter.JSON(c, http.StatusOK, map[string]string{"filename": fh.Filename, "note": note})
 	})
 
 	secure.GET("/secure/demo-errors", func(c *fiberlib.Ctx) error {
@@ -84,16 +84,16 @@ func main() {
 		}
 		switch c.Query("code") {
 		case "400":
-			return fiber.JSON(c, http.StatusBadRequest, openapi.ErrorResponse{Error: "bad request"})
+			return fiberadapter.JSON(c, http.StatusBadRequest, openapi.ErrorResponse{Error: "bad request"})
 		case "500":
-			return fiber.JSON(c, http.StatusInternalServerError, openapi.ErrorResponse{Error: "internal error"})
+			return fiberadapter.JSON(c, http.StatusInternalServerError, openapi.ErrorResponse{Error: "internal error"})
 		case "503":
-			return fiber.JSON(c, http.StatusServiceUnavailable, openapi.ErrorResponse{Error: "service unavailable"})
+			return fiberadapter.JSON(c, http.StatusServiceUnavailable, openapi.ErrorResponse{Error: "service unavailable"})
 		default:
-			return fiber.JSON(c, http.StatusOK, map[string]string{"status": "ok"})
+			return fiberadapter.JSON(c, http.StatusOK, map[string]string{"status": "ok"})
 		}
 	})
 
-	fiber.Register(base, cfg)
+	fiberadapter.Register(base, cfg)
 	_ = base.App.Listen(":8080")
 }

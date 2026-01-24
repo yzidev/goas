@@ -1,4 +1,4 @@
-package fiber
+package echoadapter
 
 import (
 	"testing"
@@ -6,14 +6,14 @@ import (
 	"github.com/aizacoders/openapigo/openapi"
 )
 
-func TestFiberNewAndWrap(t *testing.T) {
+func TestEchoNewAndWrap(t *testing.T) {
 	r := New()
-	if r == nil || r.App == nil {
+	if r == nil || r.Echo == nil {
 		t.Fatalf("New() returned nil")
 	}
-	r2 := NewFiberAdapters(nil)
-	if r2 == nil || r2.App == nil {
-		t.Fatalf("NewFiberAdapters(nil) returned nil")
+	r2 := NewEchoAdapters(nil)
+	if r2 == nil || r2.Echo == nil {
+		t.Fatalf("NewEchoAdapters(nil) returned nil")
 	}
 	openapiCfg := openapi.Config{Title: "smoke", Version: "0"}
 	Register(r, openapiCfg)

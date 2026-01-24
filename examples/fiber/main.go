@@ -8,7 +8,7 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 	fiberlib "github.com/gofiber/fiber/v2"
 
-	"github.com/aizacoders/openapigo/adapters/fiber"
+	"github.com/aizacoders/openapigo/adapters/fiberadapter"
 	"github.com/aizacoders/openapigo/openapi"
 	"github.com/aizacoders/openapigo/openapi/oas"
 )
@@ -54,12 +54,12 @@ func main() {
 	spec := b.Spec()
 
 	// wrap existing fiber App into adapter
-	r := fiber.NewFiberAdapters(base)
+	r := fiberadapter.NewFiberAdapters(base)
 	sr := oas.NewFiberRouter(r, spec)
 
-	users := sr.Group("", fiber.WithTags("Users"))
+	users := sr.Group("", fiberadapter.WithTags("Users"))
 	users.GET("/users", func(c *fiberlib.Ctx) error {
-		return fiber.JSON(c, http.StatusOK, []User{{ID: "1", Name: "Alice"}})
+		return fiberadapter.JSON(c, http.StatusOK, []User{{ID: "1", Name: "Alice"}})
 	})
 
 	users.GET("/search", func(c *fiberlib.Ctx) error {
@@ -69,8 +69,8 @@ func main() {
 
 	users.POST("/users", func(c *fiberlib.Ctx) error {
 		var in CreateUser
-		if err := fiber.Bind(c, &in); err != nil || in.Name == "" {
-			_ = fiber.JSON(c, http.StatusBadRequest, ErrorResponse{Error: "invalid body"})
+		if err := fiberadapter.Bind(c, &in); err != nil || in.Name == "" {
+			_ = fiberadapter.JSON(c, http.StatusBadRequest, ErrorResponse{Error: "invalid body"})
 			return nil
 		}
 		return c.SendStatus(http.StatusCreated)
@@ -79,58 +79,58 @@ func main() {
 	users.POST("/users/upload", func(c *fiberlib.Ctx) error {
 		fh, err := c.FormFile("file")
 		if err != nil {
-			return fiber.JSON(c, http.StatusBadRequest, ErrorResponse{Error: "missing file"})
+			return fiberadapter.JSON(c, http.StatusBadRequest, ErrorResponse{Error: "missing file"})
 		}
 		note := c.FormValue("note")
-		return fiber.JSON(c, http.StatusOK, map[string]string{"filename": fh.Filename, "note": note})
+		return fiberadapter.JSON(c, http.StatusOK, map[string]string{"filename": fh.Filename, "note": note})
 	})
 
 	users.GET("/users/:id", func(c *fiberlib.Ctx) error {
 		id := c.Params("id")
 		if id == "404" {
-			return fiber.JSON(c, http.StatusNotFound, ErrorResponse{Error: "user not found"})
+			return fiberadapter.JSON(c, http.StatusNotFound, ErrorResponse{Error: "user not found"})
 		}
-		return fiber.JSON(c, http.StatusOK, User{ID: id, Name: "Alice"})
+		return fiberadapter.JSON(c, http.StatusOK, User{ID: id, Name: "Alice"})
 	})
 
 	users.PUT("/users/:id", func(c *fiberlib.Ctx) error {
 		id := c.Params("id")
 		var in UpdateUser
-		if err := fiber.Bind(c, &in); err != nil {
-			_ = fiber.JSON(c, http.StatusBadRequest, ErrorResponse{Error: "invalid body"})
+		if err := fiberadapter.Bind(c, &in); err != nil {
+			_ = fiberadapter.JSON(c, http.StatusBadRequest, ErrorResponse{Error: "invalid body"})
 			return nil
 		}
 		if id == "404" {
-			_ = fiber.JSON(c, http.StatusNotFound, ErrorResponse{Error: "user not found"})
+			_ = fiberadapter.JSON(c, http.StatusNotFound, ErrorResponse{Error: "user not found"})
 			return nil
 		}
-		return fiber.JSON(c, http.StatusOK, User{ID: id, Name: in.Name})
+		return fiberadapter.JSON(c, http.StatusOK, User{ID: id, Name: in.Name})
 	})
 
 	users.PATCH("/users/:id", func(c *fiberlib.Ctx) error {
 		id := c.Params("id")
 		var in UpdateUser
-		if err := fiber.Bind(c, &in); err != nil {
-			_ = fiber.JSON(c, http.StatusBadRequest, ErrorResponse{Error: "invalid body"})
+		if err := fiberadapter.Bind(c, &in); err != nil {
+			_ = fiberadapter.JSON(c, http.StatusBadRequest, ErrorResponse{Error: "invalid body"})
 			return nil
 		}
 		if id == "404" {
-			_ = fiber.JSON(c, http.StatusNotFound, ErrorResponse{Error: "user not found"})
+			_ = fiberadapter.JSON(c, http.StatusNotFound, ErrorResponse{Error: "user not found"})
 			return nil
 		}
-		return fiber.JSON(c, http.StatusOK, User{ID: id, Name: in.Name})
+		return fiberadapter.JSON(c, http.StatusOK, User{ID: id, Name: in.Name})
 	})
 
 	users.DELETE("/users/:id", func(c *fiberlib.Ctx) error {
 		id := c.Params("id")
 		if id == "404" {
-			_ = fiber.JSON(c, http.StatusNotFound, ErrorResponse{Error: "user not found"})
+			_ = fiberadapter.JSON(c, http.StatusNotFound, ErrorResponse{Error: "user not found"})
 			return nil
 		}
 		return c.SendStatus(http.StatusNoContent)
 	})
 
-	fiber.Register(r, openapi.Config{
+	fiberadapter.Register(r, openapi.Config{
 		Title:   "User API",
 		Version: "1.0.0",
 		Tags:    openapi3.Tags{{Name: "Users", Description: "User management endpoints"}},

@@ -3,7 +3,7 @@
 package main
 
 import (
-	ginadapter "github.com/aizacoders/openapigo/adapters/gin"
+	"github.com/aizacoders/openapigo/adapters/ginadapter"
 	"github.com/aizacoders/openapigo/openapi/oas"
 	ginlib "github.com/gin-gonic/gin"
 )

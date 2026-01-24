@@ -5,7 +5,7 @@ package main
 import (
 	"github.com/getkin/kin-openapi/openapi3"
 
-	"github.com/aizacoders/openapigo/adapters/gin"
+	"github.com/aizacoders/openapigo/adapters/ginadapter"
 	"github.com/aizacoders/openapigo/openapi"
 	"github.com/aizacoders/openapigo/openapi/oas"
 )
@@ -44,7 +44,7 @@ func registerSecureRoutes(r *oas.GinRouter, bearer, apiKey *openapi3.SecurityReq
 
 	r.GET("/secure/healthz", handleSecureHealthz)
 
-	secure := r.Group("", gin.WithTags("Secure Users"))
+	secure := r.Group("", ginadapter.WithTags("Secure Users"))
 	secure.GET("/secure/users", handleSecureListUsers)
 	secure.POST("/secure/users", handleSecureCreateUser)
 	secure.POST("/secure/users/upload", handleSecureUploadUserFile)

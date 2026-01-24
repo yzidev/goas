@@ -5,10 +5,10 @@ package main
 import (
 	"net/http"
 
+	"github.com/aizacoders/openapigo/adapters/echoadapter"
 	"github.com/getkin/kin-openapi/openapi3"
 	echolib "github.com/labstack/echo/v4"
 
-	"github.com/aizacoders/openapigo/adapters/echo"
 	"github.com/aizacoders/openapigo/openapi"
 	"github.com/aizacoders/openapigo/openapi/oas"
 )
@@ -54,12 +54,12 @@ func main() {
 	spec := b.Spec()
 
 	// wrap the existing echo instance into the adapter
-	r := echo.NewEchoAdapters(base)
+	r := echoadapter.NewEchoAdapters(base)
 	sr := oas.NewEchoRouter(r, spec)
 
-	users := sr.Group("", echo.WithTags("Users"))
+	users := sr.Group("", echoadapter.WithTags("Users"))
 	users.GET("/users", func(c echolib.Context) error {
-		return echo.JSON(c, http.StatusOK, []User{{ID: "1", Name: "Alice"}})
+		return echoadapter.JSON(c, http.StatusOK, []User{{ID: "1", Name: "Alice"}})
 	})
 
 	users.GET("/search", func(c echolib.Context) error {
@@ -69,8 +69,8 @@ func main() {
 
 	users.POST("/users", func(c echolib.Context) error {
 		var in CreateUser
-		if err := echo.Bind(c, &in); err != nil || in.Name == "" {
-			_ = echo.JSON(c, http.StatusBadRequest, ErrorResponse{Error: "invalid body"})
+		if err := echoadapter.Bind(c, &in); err != nil || in.Name == "" {
+			_ = echoadapter.JSON(c, http.StatusBadRequest, ErrorResponse{Error: "invalid body"})
 			return nil
 		}
 		return c.NoContent(http.StatusCreated)
@@ -79,59 +79,59 @@ func main() {
 	users.POST("/users/upload", func(c echolib.Context) error {
 		f, err := c.FormFile("file")
 		if err != nil {
-			_ = echo.JSON(c, http.StatusBadRequest, ErrorResponse{Error: "missing file"})
+			_ = echoadapter.JSON(c, http.StatusBadRequest, ErrorResponse{Error: "missing file"})
 			return nil
 		}
 		note := c.FormValue("note")
-		return echo.JSON(c, http.StatusOK, map[string]string{"filename": f.Filename, "note": note})
+		return echoadapter.JSON(c, http.StatusOK, map[string]string{"filename": f.Filename, "note": note})
 	})
 
 	users.GET("/users/:id", func(c echolib.Context) error {
 		id := c.Param("id")
 		if id == "404" {
-			return echo.JSON(c, http.StatusNotFound, ErrorResponse{Error: "user not found"})
+			return echoadapter.JSON(c, http.StatusNotFound, ErrorResponse{Error: "user not found"})
 		}
-		return echo.JSON(c, http.StatusOK, User{ID: id, Name: "Alice"})
+		return echoadapter.JSON(c, http.StatusOK, User{ID: id, Name: "Alice"})
 	})
 
 	users.PUT("/users/:id", func(c echolib.Context) error {
 		id := c.Param("id")
 		var in UpdateUser
-		if err := echo.Bind(c, &in); err != nil {
-			_ = echo.JSON(c, http.StatusBadRequest, ErrorResponse{Error: "invalid body"})
+		if err := echoadapter.Bind(c, &in); err != nil {
+			_ = echoadapter.JSON(c, http.StatusBadRequest, ErrorResponse{Error: "invalid body"})
 			return nil
 		}
 		if id == "404" {
-			_ = echo.JSON(c, http.StatusNotFound, ErrorResponse{Error: "user not found"})
+			_ = echoadapter.JSON(c, http.StatusNotFound, ErrorResponse{Error: "user not found"})
 			return nil
 		}
-		return echo.JSON(c, http.StatusOK, User{ID: id, Name: in.Name})
+		return echoadapter.JSON(c, http.StatusOK, User{ID: id, Name: in.Name})
 	})
 
 	users.PATCH("/users/:id", func(c echolib.Context) error {
 		id := c.Param("id")
 		var in UpdateUser
-		if err := echo.Bind(c, &in); err != nil {
-			_ = echo.JSON(c, http.StatusBadRequest, ErrorResponse{Error: "invalid body"})
+		if err := echoadapter.Bind(c, &in); err != nil {
+			_ = echoadapter.JSON(c, http.StatusBadRequest, ErrorResponse{Error: "invalid body"})
 			return nil
 		}
 		if id == "404" {
-			_ = echo.JSON(c, http.StatusNotFound, ErrorResponse{Error: "user not found"})
+			_ = echoadapter.JSON(c, http.StatusNotFound, ErrorResponse{Error: "user not found"})
 			return nil
 		}
-		return echo.JSON(c, http.StatusOK, User{ID: id, Name: in.Name})
+		return echoadapter.JSON(c, http.StatusOK, User{ID: id, Name: in.Name})
 	})
 
 	users.DELETE("/users/:id", func(c echolib.Context) error {
 		id := c.Param("id")
 		if id == "404" {
-			_ = echo.JSON(c, http.StatusNotFound, ErrorResponse{Error: "user not found"})
+			_ = echoadapter.JSON(c, http.StatusNotFound, ErrorResponse{Error: "user not found"})
 			return nil
 		}
 		return c.NoContent(http.StatusNoContent)
 	})
 
-	echo.Register(r, openapi.Config{
+	echoadapter.Register(r, openapi.Config{
 		Title:   "User API",
 		Version: "1.0.0",
 		Tags:    openapi3.Tags{{Name: "Users", Description: "User management endpoints"}},

@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	muxadapter "github.com/aizacoders/openapigo/adapters/mux"
+	"github.com/aizacoders/openapigo/adapters/muxadapter"
 	"github.com/aizacoders/openapigo/openapi"
 	"github.com/aizacoders/openapigo/openapi/oas"
 	"github.com/getkin/kin-openapi/openapi3"

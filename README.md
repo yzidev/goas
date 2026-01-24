@@ -19,12 +19,14 @@ The goal is to keep your routing code **clean** (plain `GET/POST/PUT/PATCH/DELET
 
 ## Key concepts
 
-### 1) Base router (net/http + chi)
+### 1) Base router (net/http)
 
 Use the built-in router:
 
-- `openapi.NewRouter()` → returns an `http.Handler`
+- `openapi.NewRouter()` → returns an `http.Handler` (lightweight net/http-backed router)
 - register routes with `GET/POST/PUT/PATCH/DELETE`
+
+Note: the default router implementation used to be chi-backed; it now uses a small net/http-based mux compatible with the project's needs. Adapters for Gin, Echo and Fiber remain available.
 
 ### 2) Config-first spec (SpringBoot-like)
 
@@ -66,6 +68,12 @@ type User struct {
 }
 
 func main() {
+	// If you prefer manual mounting you can do:
+	// mux := http.NewServeMux()
+	// base := openapi.NewRouter()
+	// mux.Handle("/", base)
+	// or simply mount the router directly via the httprouter adapter:
+	// base := httprouter.New(mux) // mounts automatically on provided ServeMux
 	base := openapi.NewRouter()
 
 	// 1) Define spec (grouped, clean)
@@ -82,7 +90,7 @@ func main() {
 
 	// 3) Register OpenAPI + Swagger UI
 	openapi.Register(base, openapi.Config{Title: "User API", Version: "1.0.0"})
-	_ = http.ListenAndServe(":8080", r)
+	_ = http.ListenAndServe(":8080", base)
 }
 ```
 

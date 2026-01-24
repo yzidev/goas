@@ -129,3 +129,7 @@ cfg := openapi.Config{Title: "API", Version: "1.0.0", SecuritySchemes: map[strin
 - `example/gin/main.go` — demonstrates wrapping an existing engine and registering OpenAPI
 - `example/gin/routes.go` — shows clean route declarations
 - `openapi/simple` — the spec builder API used to declare schemas and responses
+
+### Note about core router
+
+The OpenAPIGO core router is a lightweight net/http-backed mux. The Gin adapter continues to work unchanged. For the net/http example you can mount the router on a ServeMux easily (the `httprouter` adapter supports `httprouter.New(mux)` to auto-mount).

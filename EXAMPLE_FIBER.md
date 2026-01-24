@@ -83,3 +83,7 @@ adapter.App.Listen(":8080")
 
 - `NewFiberAdapters` lets you configure middleware and settings on the Fiber app before wrapping it with the adapter.
 - Use `MultipartUpload` in the Spec builder to expose file upload in Swagger UI.
+
+### Note about core router
+
+The OpenAPIGO core router is a lightweight net/http-backed mux. Adapter packages (including Fiber) integrate with the core behavior and continue to work as before. If you use the `httprouter` adapter you can optionally mount the router automatically onto a `*http.ServeMux` by calling `httprouter.New(mux)`.

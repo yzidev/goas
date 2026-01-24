@@ -11,9 +11,9 @@ func TestFiberNewAndWrap(t *testing.T) {
 	if r == nil || r.App == nil {
 		t.Fatalf("New() returned nil")
 	}
-	r2 := NewFromApp(nil)
+	r2 := NewFiberAdapters(nil)
 	if r2 == nil || r2.App == nil {
-		t.Fatalf("NewFromApp(nil) returned nil")
+		t.Fatalf("NewFiberAdapters(nil) returned nil")
 	}
 	openapiCfg := openapi.Config{Title: "smoke", Version: "0"}
 	Register(r, openapiCfg)

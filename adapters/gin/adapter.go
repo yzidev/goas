@@ -25,10 +25,10 @@ func New() *Router {
 	return &Router{Engine: ginlib.New()}
 }
 
-// NewFromEngine wraps an existing *gin.Engine into the adapter Router so callers
+// NewGinAdapters wraps an existing *gin.Engine into the adapter Router so callers
 // who create their own engine (e.g., gin.Default()) can still use the adapter
 // helpers and OpenAPI registration without changing import paths.
-func NewFromEngine(engine *ginlib.Engine) *Router {
+func NewGinAdapters(engine *ginlib.Engine) *Router {
 	if engine == nil {
 		engine = ginlib.New()
 	}

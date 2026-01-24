@@ -20,9 +20,9 @@ func New() *Router {
 	return &Router{App: fiberlib.New()}
 }
 
-// NewFromApp wraps an existing *fiber.App into the adapter Router so callers
+// NewFiberAdapters wraps an existing *fiber.App into the adapter Router so callers
 // who create their own app (e.g., fiber.New()) can still use the adapter.
-func NewFromApp(app *fiberlib.App) *Router {
+func NewFiberAdapters(app *fiberlib.App) *Router {
 	if app == nil {
 		app = fiberlib.New()
 	}

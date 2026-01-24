@@ -12,9 +12,9 @@ func TestGinNewAndWrap(t *testing.T) {
 		t.Fatalf("New() returned nil")
 	}
 	// wrap nil engine -> should create a non-nil router
-	r2 := NewFromEngine(nil)
+	r2 := NewGinAdapters(nil)
 	if r2 == nil || r2.Engine == nil {
-		t.Fatalf("NewFromEngine(nil) returned nil")
+		t.Fatalf("NewGinOAS(nil) returned nil")
 	}
 	// Register should not panic with minimal config
 	openapiCfg := openapi.Config{Title: "smoke", Version: "0"}

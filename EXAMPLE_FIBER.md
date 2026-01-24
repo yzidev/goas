@@ -49,7 +49,7 @@ import (
 
 ```go
 app := fiberlib.New()
-adapter := fiberadapter.NewFromApp(app)
+adapter := fiberadapter.NewFiberAdapters(app)
 ```
 
 3) Build Spec with `simple.NewSpec()`
@@ -81,5 +81,5 @@ adapter.App.Listen(":8080")
 
 6) Notes
 
-- `NewFromApp` allows you to configure middleware and settings on the Fiber app before wrapping it with the adapter.
+- `NewFiberAdapters` lets you configure middleware and settings on the Fiber app before wrapping it with the adapter.
 - Use `MultipartUpload` in the Spec builder to expose file upload in Swagger UI.

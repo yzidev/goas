@@ -54,7 +54,7 @@ func main() {
 	spec := b.Spec()
 
 	// wrap existing fiber App into adapter
-	r := fiber.NewFromApp(base)
+	r := fiber.NewFiberAdapters(base)
 
 	sr := simple.NewFiber(r, spec)
 	users := sr.Group("", fiber.WithTags("Users"))

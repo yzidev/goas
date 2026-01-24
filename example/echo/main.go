@@ -54,7 +54,7 @@ func main() {
 	spec := b.Spec()
 
 	// wrap the existing echo instance into the adapter
-	r := echo.NewFromEcho(base)
+	r := echo.NewEchoAdapters(base)
 
 	sr := simple.NewEcho(r, spec)
 	users := sr.Group("", echo.WithTags("Users"))

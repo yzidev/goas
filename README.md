@@ -229,7 +229,7 @@ handler code clean while still generating OpenAPI and mounting Swagger UI.
 Pattern (recommended):
 
 1. Create your framework engine/app (e.g., `gin`, `echo`, `fiber`).
-2. Wrap it with the adapter `NewFrom*` helper (so the adapter captures route metadata).
+2. Wrap it with the adapter `NewGinAdapters` / `NewEchoAdapters` / `NewFiberAdapters` (so the adapter captures route metadata).
 3. Create the `simple` wrapper using the adapter and your `Spec`.
 4. Register OpenAPI via the adapter `Register` helper and run the engine/app.
 
@@ -245,7 +245,7 @@ import (
 )
 
 engine := ginlib.New()
-adapter := ginadapter.NewFromEngine(engine)
+adapter := ginadapter.NewGinAdapters(engine)
 sr := simple.NewGin(adapter, mySpec)
 // register routes on sr ...
 ginadapter.Register(adapter, openapi.Config{Title: "My API", Version: "0.1.0"})
@@ -262,7 +262,7 @@ import (
 )
 
 base := echolib.New()
-adapter := echoadapter.NewFromEcho(base)
+adapter := echoadapter.NewEchoAdapters(base)
 sr := simple.NewEcho(adapter, mySpec)
 // register routes on sr ...
 echoadapter.Register(adapter, openapi.Config{Title: "My API", Version: "0.1.0"})
@@ -279,7 +279,7 @@ import (
 )
 
 app := fiberlib.New()
-adapter := fiberadapter.NewFromApp(app)
+adapter := fiberadapter.NewFiberAdapters(app)
 sr := simple.NewFiber(adapter, mySpec)
 // register routes on sr ...
 fiberadapter.Register(adapter, openapi.Config{Title: "My API", Version: "0.1.0"})
@@ -287,7 +287,7 @@ adapter.App.Listen(":8080")
 ```
 
 Notes:
-- The `NewFrom*` helpers let you keep your preferred engine/app initialization (e.g., `gin.Default()`), while still enabling OpenAPIGO to capture route metadata.
+- The `New*Adapters` helpers let you keep your preferred engine/app initialization (e.g., `gin.Default()`), while still enabling OpenAPIGO to capture route metadata.
 - If you previously built with `-tags`, adapters are now compiled by default — no need to use build tags to get adapter implementations.
 
 ---

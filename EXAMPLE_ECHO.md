@@ -49,7 +49,7 @@ import (
 
 ```go
 base := echolib.New()
-adapter := echoadapter.NewFromEcho(base)
+adapter := echoadapter.NewEchoAdapters(base)
 ```
 
 3) Build Spec with `simple.NewSpec()` (group routes, define Req/Res and multipart)
@@ -81,5 +81,5 @@ adapter.Echo.Start(":8080")
 
 6) Notes
 
-- `NewFromEcho` lets you create middleware and configure the Echo instance before wrapping it with the adapter.
+- `NewEchoAdapters` lets you create middleware and configure the Echo instance before wrapping it with the adapter.
 - Use `MultipartUpload` in the Spec builder to expose file upload inputs in Swagger UI.

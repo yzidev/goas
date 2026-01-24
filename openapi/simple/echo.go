@@ -1,5 +1,3 @@
-//go:build echo
-
 package simple
 
 import (

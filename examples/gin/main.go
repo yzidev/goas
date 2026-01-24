@@ -4,7 +4,7 @@ package main
 
 import (
 	ginadapter "github.com/aizacoders/openapigo/adapters/gin"
-	"github.com/aizacoders/openapigo/openapi/simple"
+	"github.com/aizacoders/openapigo/openapi/oas"
 	ginlib "github.com/gin-gonic/gin"
 )
 
@@ -30,7 +30,7 @@ func main() {
 
 	// wrap existing engine into adapter router so OpenAPI metadata is captured
 	r := ginadapter.NewGinAdapters(engine)
-	sr := simple.NewGinRouter(r, openapiSpec())
+	sr := oas.NewGinRouter(r, openapiSpec())
 
 	registerSystemRoutes(sr)
 	registerUserRoutes(sr)

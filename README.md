@@ -249,7 +249,7 @@ Examples:
 import (
     ginlib "github.com/gin-gonic/gin"
     ginadapter "github.com/aizacoders/openapigo/adapters/gin"
-    "github.com/aizacoders/openapigo/openapi/simple"
+    "github.com/aizacoders/openapigo/openapi/oas"
 )
 
 engine := ginlib.New()
@@ -266,7 +266,7 @@ adapter.Engine.Run(":8080")
 import (
     echolib "github.com/labstack/echo/v4"
     echoadapter "github.com/aizacoders/openapigo/adapters/echo"
-    "github.com/aizacoders/openapigo/openapi/simple"
+    "github.com/aizacoders/openapigo/openapi/oas"
 )
 
 base := echolib.New()
@@ -283,7 +283,7 @@ adapter.Echo.Start(":8080")
 import (
     fiberlib "github.com/gofiber/fiber/v2"
     fiberadapter "github.com/aizacoders/openapigo/adapters/fiber"
-    "github.com/aizacoders/openapigo/openapi/simple"
+    "github.com/aizacoders/openapigo/openapi/oas"
 )
 
 app := fiberlib.New()

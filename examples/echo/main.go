@@ -10,7 +10,7 @@ import (
 
 	"github.com/aizacoders/openapigo/adapters/echo"
 	"github.com/aizacoders/openapigo/openapi"
-	"github.com/aizacoders/openapigo/openapi/simple"
+	"github.com/aizacoders/openapigo/openapi/oas"
 )
 
 type User struct {
@@ -33,8 +33,8 @@ type CreateUser struct {
 func main() {
 	base := echolib.New()
 
-	b := simple.NewSpec()
-	b.GroupTags("", []string{"Users"}, func(s *simple.SpecBuilder) {
+	b := oas.NewSpec()
+	b.GroupTags("", []string{"Users"}, func(s *oas.SpecBuilder) {
 		s.GET("/users").Res([]User{}).OK()
 		s.GET("/search").Query(
 			openapi.QueryParam{Name: "q", Type: openapi.ParamString, Required: true, Description: "Search term"},
@@ -55,7 +55,7 @@ func main() {
 
 	// wrap the existing echo instance into the adapter
 	r := echo.NewEchoAdapters(base)
-	sr := simple.NewEchoRouter(r, spec)
+	sr := oas.NewEchoRouter(r, spec)
 
 	users := sr.Group("", echo.WithTags("Users"))
 	users.GET("/users", func(c echolib.Context) error {

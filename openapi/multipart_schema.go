@@ -22,7 +22,7 @@ type MultipartField struct {
 // - primitive fields as string/integer/number/boolean
 // - required fields
 //
-// It is designed for use with the simple builder:
+// It is designed for use with the oas builder:
 //
 //	s.POST("/upload").Req(openapi.MultipartSchema("file", openapi.MultipartField{Name: "note"})).Res(...)
 func MultipartSchema(fileField string, fields ...MultipartField) *openapi3.SchemaRef {

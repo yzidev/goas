@@ -36,7 +36,7 @@ import (
 
     "github.com/aizacoders/openapigo/adapters/httprouter"
     "github.com/aizacoders/openapigo/openapi"
-    "github.com/aizacoders/openapigo/openapi/simple"
+    "github.com/aizacoders/openapigo/openapi/oas"
 )
 ```
 

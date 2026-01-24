@@ -41,7 +41,7 @@ import (
     fiberlib "github.com/gofiber/fiber/v2"
     fiberadapter "github.com/aizacoders/openapigo/adapters/fiber"
     "github.com/aizacoders/openapigo/openapi"
-    "github.com/aizacoders/openapigo/openapi/simple"
+    "github.com/aizacoders/openapigo/openapi/oas"
 )
 ```
 

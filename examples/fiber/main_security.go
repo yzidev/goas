@@ -11,7 +11,7 @@ import (
 
 	"github.com/aizacoders/openapigo/adapters/fiber"
 	"github.com/aizacoders/openapigo/openapi"
-	"github.com/aizacoders/openapigo/openapi/simple"
+	"github.com/aizacoders/openapigo/openapi/oas"
 )
 
 type SecUser struct {
@@ -34,8 +34,8 @@ func main() {
 	bearer := openapi3.NewSecurityRequirement().Authenticate("bearerAuth")
 	apiKey := openapi3.NewSecurityRequirement().Authenticate("apiKeyAuth")
 
-	b := simple.NewSpec()
-	b.GroupTags("", []string{"Secure Users"}, func(s *simple.SpecBuilder) {
+	b := oas.NewSpec()
+	b.GroupTags("", []string{"Secure Users"}, func(s *oas.SpecBuilder) {
 		s.GET("/secure/users").Security(&bearer).Res([]SecUser{}).OK()
 		s.POST("/secure/users").Security(&apiKey).Res(struct{}{}).Created()
 
@@ -48,7 +48,7 @@ func main() {
 
 	spec := b.Spec()
 
-	r := simple.NewFiberRouter(base, spec)
+	r := oas.NewFiberRouter(base, spec)
 	secure := r.Group("", fiber.WithTags("Secure Users"))
 
 	secure.GET("/secure/users", func(c *fiberlib.Ctx) error {

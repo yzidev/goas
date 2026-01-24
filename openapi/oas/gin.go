@@ -1,4 +1,4 @@
-package simple
+package oas
 
 import (
 	"net/http"
@@ -39,7 +39,7 @@ func joinGin(prefix, p string) string {
 	if p == "" {
 		return prefix
 	}
-	// keep it simple: mimic adapter join behavior
+	// keep it oas: mimic adapter join behavior
 	if !strings.HasPrefix(prefix, "/") {
 		prefix = "/" + prefix
 	}

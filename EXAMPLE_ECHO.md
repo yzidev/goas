@@ -41,7 +41,7 @@ import (
     echolib "github.com/labstack/echo/v4"
     echoadapter "github.com/aizacoders/openapigo/adapters/echo"
     "github.com/aizacoders/openapigo/openapi"
-    "github.com/aizacoders/openapigo/openapi/simple"
+    "github.com/aizacoders/openapigo/openapi/oas"
 )
 ```
 

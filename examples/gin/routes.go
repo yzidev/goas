@@ -7,17 +7,17 @@ import (
 
 	"github.com/aizacoders/openapigo/adapters/gin"
 	"github.com/aizacoders/openapigo/openapi"
-	"github.com/aizacoders/openapigo/openapi/simple"
+	"github.com/aizacoders/openapigo/openapi/oas"
 )
 
 // registerRoutes wires the endpoints in a readable and grouped way.
 // (Non-typed, non-security variant.)
 
-func registerSystemRoutes(r *simple.GinRouter) {
+func registerSystemRoutes(r *oas.GinRouter) {
 	r.GET("/healthz", handleHealthz)
 }
 
-func registerUserRoutes(r *simple.GinRouter) {
+func registerUserRoutes(r *oas.GinRouter) {
 	users := r.Group("", gin.WithTags("Users"))
 
 	users.GET("/users", handleListUsers)
@@ -41,12 +41,12 @@ func openAPICfg() openapi.Config {
 	}
 }
 
-func openapiSpec() simple.Spec {
-	b := simple.NewSpec()
-	b.GroupTags("", []string{"System"}, func(s *simple.SpecBuilder) {
+func openapiSpec() oas.Spec {
+	b := oas.NewSpec()
+	b.GroupTags("", []string{"System"}, func(s *oas.SpecBuilder) {
 		s.GET("/healthz").Res(map[string]string{}).OK()
 	})
-	b.GroupTags("", []string{"Users"}, func(s *simple.SpecBuilder) {
+	b.GroupTags("", []string{"Users"}, func(s *oas.SpecBuilder) {
 		s.GET("/users").Res([]User{}).OK()
 		s.GET("/search").Query(
 			openapi.QueryParam{Name: "q", Type: openapi.ParamString, Required: true, Description: "Search term"},

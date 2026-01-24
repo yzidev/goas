@@ -10,7 +10,7 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 
 	"github.com/aizacoders/openapigo/openapi"
-	"github.com/aizacoders/openapigo/openapi/simple"
+	"github.com/aizacoders/openapigo/openapi/oas"
 )
 
 type SecUser struct {
@@ -36,8 +36,8 @@ func main() {
 	bearer := openapi3.NewSecurityRequirement().Authenticate("bearerAuth")
 	apiKey := openapi3.NewSecurityRequirement().Authenticate("apiKeyAuth")
 
-	b := simple.NewSpec()
-	b.GroupTags("", []string{"Secure Users"}, func(s *simple.SpecBuilder) {
+	b := oas.NewSpec()
+	b.GroupTags("", []string{"Secure Users"}, func(s *oas.SpecBuilder) {
 		s.GET("/secure/users").Security(&bearer).Res([]SecUser{}).OK()
 		s.POST("/secure/users").Security(&apiKey).Res(struct{}{}).Created()
 
@@ -49,7 +49,7 @@ func main() {
 
 	spec := b.Spec()
 
-	r := simple.NewHttpRouter(base, spec)
+	r := oas.NewHttpRouter(base, spec)
 	secure := r.Group("", openapi.WithTags("Secure Users"))
 
 	// Bearer-protected endpoint

@@ -8,7 +8,7 @@ import (
 
 	muxadapter "github.com/aizacoders/openapigo/adapters/mux"
 	"github.com/aizacoders/openapigo/openapi"
-	"github.com/aizacoders/openapigo/openapi/simple"
+	"github.com/aizacoders/openapigo/openapi/oas"
 	"github.com/getkin/kin-openapi/openapi3"
 )
 
@@ -176,11 +176,11 @@ func api2GetUser(w http.ResponseWriter, req *http.Request) {
 
 // openapiSpec builds the OpenAPI spec for the examples (keeps main() clean),
 // includes both API v1.0 and v2.0 groups to mirror the routes in main().
-func openapiSpec() simple.Spec {
-	b := simple.NewSpec()
+func openapiSpec() oas.Spec {
+	b := oas.NewSpec()
 
 	// API v1.0 (Users)
-	b.GroupTags("/api/v1.0", []string{"Users"}, func(s *simple.SpecBuilder) {
+	b.GroupTags("/api/v1.0", []string{"Users"}, func(s *oas.SpecBuilder) {
 		s.GET("/users").Res([]User{}).OK()
 		s.GET("/search").Query(
 			openapi.QueryParam{Name: "q", Type: openapi.ParamString, Required: true, Description: "Search term"},
@@ -197,7 +197,7 @@ func openapiSpec() simple.Spec {
 	})
 
 	// API v2.0 (Users V2.0) - smaller surface per main.go: hello + users create/get
-	b.GroupTags("/api/v2.0", []string{"Users V2.0"}, func(s *simple.SpecBuilder) {
+	b.GroupTags("/api/v2.0", []string{"Users V2.0"}, func(s *oas.SpecBuilder) {
 		s.GET("/hello").Res(map[string]string{}).OK()
 		// v2 create returns the created user object
 		s.POST("/users").Req(CreateUser{}).Res(User{}).Created()
@@ -212,7 +212,7 @@ func main() {
 
 	// Router setup by openapigo/httprouter adapter
 	base := muxadapter.NewHttpAdapters(mux)
-	r := simple.NewHttpRouter(base, openapiSpec())
+	r := oas.NewHttpRouter(base, openapiSpec())
 
 	// Clean routes: just HTTP methods + handlers.
 	users := r.Group("/api/v1.0", openapi.WithTags("Users"))

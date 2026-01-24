@@ -25,7 +25,7 @@ type RouteMeta struct {
 	PathParams     []PathParamSpec
 }
 
-// Router uses a small net/http-backed mux that understands simple path params
+// Router uses a small net/http-backed mux that understands oas path params
 // of the form /users/{id}. This avoids depending on chi while preserving
 // behavior needed by the OpenAPI builder (path param extraction via context).
 type Router struct {

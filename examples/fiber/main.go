@@ -10,7 +10,7 @@ import (
 
 	"github.com/aizacoders/openapigo/adapters/fiber"
 	"github.com/aizacoders/openapigo/openapi"
-	"github.com/aizacoders/openapigo/openapi/simple"
+	"github.com/aizacoders/openapigo/openapi/oas"
 )
 
 type User struct {
@@ -33,8 +33,8 @@ type ErrorResponse struct {
 func main() {
 	base := fiberlib.New()
 
-	b := simple.NewSpec()
-	b.GroupTags("", []string{"Users"}, func(s *simple.SpecBuilder) {
+	b := oas.NewSpec()
+	b.GroupTags("", []string{"Users"}, func(s *oas.SpecBuilder) {
 		s.GET("/users").Res([]User{}).OK()
 		s.GET("/search").Query(
 			openapi.QueryParam{Name: "q", Type: openapi.ParamString, Required: true, Description: "Search term"},
@@ -55,7 +55,7 @@ func main() {
 
 	// wrap existing fiber App into adapter
 	r := fiber.NewFiberAdapters(base)
-	sr := simple.NewFiberRouter(r, spec)
+	sr := oas.NewFiberRouter(r, spec)
 
 	users := sr.Group("", fiber.WithTags("Users"))
 	users.GET("/users", func(c *fiberlib.Ctx) error {

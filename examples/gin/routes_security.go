@@ -7,7 +7,7 @@ import (
 
 	"github.com/aizacoders/openapigo/adapters/gin"
 	"github.com/aizacoders/openapigo/openapi"
-	"github.com/aizacoders/openapigo/openapi/simple"
+	"github.com/aizacoders/openapigo/openapi/oas"
 )
 
 func openAPICfgSecurity() (openapi.Config, *openapi3.SecurityRequirement, *openapi3.SecurityRequirement) {
@@ -28,9 +28,9 @@ func openAPICfgSecurity() (openapi.Config, *openapi3.SecurityRequirement, *opena
 	return cfg, &bearer, &apiKey
 }
 
-func registerSecureRoutes(r *simple.GinRouter, bearer, apiKey *openapi3.SecurityRequirement) {
-	b := simple.NewSpec()
-	b.GroupTags("", []string{"Secure Users"}, func(s *simple.SpecBuilder) {
+func registerSecureRoutes(r *oas.GinRouter, bearer, apiKey *openapi3.SecurityRequirement) {
+	b := oas.NewSpec()
+	b.GroupTags("", []string{"Secure Users"}, func(s *oas.SpecBuilder) {
 		s.GET("/secure/healthz").Security(bearer).Res(map[string]string{}).OK()
 		s.GET("/secure/users").Security(bearer).Res([]SecUser{}).OK()
 		s.POST("/secure/users").Security(apiKey).Res(struct{}{}).Created()

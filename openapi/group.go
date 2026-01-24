@@ -17,7 +17,7 @@ import (
 // Options provided to the group are applied to every route in that group,
 // and can be overridden/extended by per-route options.
 //
-// Path joining is kept simple and consistent with common router behavior.
+// Path joining is kept oas and consistent with common router behavior.
 // We avoid cleaning ":" or "{}" segments; NormalizePath handles OpenAPI normalization.
 type Group struct {
 	prefix string
@@ -28,7 +28,7 @@ type Group struct {
 // NewGroup constructs a Group with the provided prefix, options and a custom
 // route function. Useful for adapters or wrappers that need the group's
 // routing to call a specific handler registration function (for examples,
-// simple.Router wants to ensure route registrations go through its Handle
+// oas.Router wants to ensure route registrations go through its Handle
 // method so spec injection happens correctly).
 func NewGroup(prefix string, opts []HandlerOption, route func(method, path string, h http.HandlerFunc, opts ...HandlerOption)) *Group {
 	return &Group{prefix: prefix, opts: opts, route: route}

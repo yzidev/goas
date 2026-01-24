@@ -115,7 +115,7 @@ func JSON(c *fiberlib.Ctx, code int, v interface{}) error { return c.Status(code
 
 type SecurityRequirement = openapi3.SecurityRequirement
 
-// NOTE: Typed (generic) handler helpers were removed to keep the API simple.
+// NOTE: Typed (generic) handler helpers were removed to keep the API oas.
 
 // Group allows applying shared options (e.g., tags/security) and a common path prefix.
 type Group struct {

@@ -1,4 +1,4 @@
-package simple
+package oas
 
 import (
 	"net/http"

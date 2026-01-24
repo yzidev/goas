@@ -195,4 +195,4 @@ func JSON(c *ginlib.Context, code int, v interface{}) { c.JSON(code, v) }
 // Security helper alias.
 type SecurityRequirement = openapi3.SecurityRequirement
 
-// NOTE: Typed (generic) handler helpers were removed to keep the API simple.
+// NOTE: Typed (generic) handler helpers were removed to keep the API oas.

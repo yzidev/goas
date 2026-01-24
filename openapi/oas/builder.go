@@ -1,4 +1,4 @@
-package simple
+package oas
 
 import (
 	"net/http"
@@ -13,8 +13,8 @@ import (
 //
 // Example:
 //
-//	spec := simple.NewSpec().
-//		Group("/", func(s *simple.SpecBuilder) {
+//	spec := oas.NewSpec().
+//		Group("/", func(s *oas.SpecBuilder) {
 //			s.GET("/users").Tags("Users").Res([]User{}).OK()
 //			s.POST("/users").Tags("Users").Req(CreateUser{}).Res(struct{}{}).Status(http.StatusCreated)
 //		})

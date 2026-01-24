@@ -4,7 +4,7 @@ package main
 
 import (
 	"github.com/aizacoders/openapigo/adapters/gin"
-	"github.com/aizacoders/openapigo/openapi/simple"
+	"github.com/aizacoders/openapigo/openapi/oas"
 )
 
 type SecUser struct {
@@ -17,7 +17,7 @@ func main() {
 
 	cfg, bearer, apiKey := openAPICfgSecurity()
 
-	sr := simple.NewGinRouter(r, simple.Spec{})
+	sr := oas.NewGinRouter(r, oas.Spec{})
 	registerSecureRoutes(sr, bearer, apiKey)
 
 	gin.Register(r, cfg)

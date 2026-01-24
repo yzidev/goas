@@ -1,6 +1,6 @@
 //go:build gin
 
-package simple
+package oas
 
 import (
 	"net/http"

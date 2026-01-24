@@ -43,7 +43,7 @@ import (
     ginlib "github.com/gin-gonic/gin"
     ginadapter "github.com/aizacoders/openapigo/adapters/gin"
     "github.com/aizacoders/openapigo/openapi"
-    "github.com/aizacoders/openapigo/openapi/simple"
+    "github.com/aizacoders/openapigo/openapi/oas"
 )
 ```
 

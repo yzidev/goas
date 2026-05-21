@@ -3,6 +3,7 @@
 package main
 
 import (
+	ginlib "github.com/gin-gonic/gin"
 	"github.com/yzidev/openapigo/adapters/ginadapter"
 )
 
@@ -12,12 +13,12 @@ type SecUser struct {
 }
 
 func main() {
-	r := ginadapter.New()
+	engine := ginlib.New()
 
-	cfg, bearer, apiKey := openAPICfgSecurity()
+	cfg := openAPICfgSecurity()
 
-	registerSecureRoutes(r, bearer, apiKey)
+	registerSecureRoutes(engine)
 
-	r.Docs(cfg)
-	_ = r.Engine.Run(":8080")
+	ginadapter.Docs(engine, cfg)
+	_ = engine.Run(":8080")
 }

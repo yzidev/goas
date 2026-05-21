@@ -19,7 +19,9 @@ type SecUser struct {
 }
 
 func main() {
-	base := echoadapter.New()
+	base := echolib.New()
+	bearer := openapi3.NewSecurityRequirement().Authenticate("bearerAuth")
+	apiKey := openapi3.NewSecurityRequirement().Authenticate("apiKeyAuth")
 
 	cfg := openapi.Config{
 		Title:   "User API (Echo + Security)",
@@ -28,13 +30,10 @@ func main() {
 			"bearerAuth": {Value: &openapi3.SecurityScheme{Type: "http", Scheme: "bearer", BearerFormat: "JWT"}},
 			"apiKeyAuth": {Value: &openapi3.SecurityScheme{Type: "apiKey", In: "header", Name: "X-API-Key"}},
 		},
+		Security: openapi3.SecurityRequirements{bearer, apiKey},
 	}
 
-	bearer := openapi3.NewSecurityRequirement().Authenticate("bearerAuth")
-	apiKey := openapi3.NewSecurityRequirement().Authenticate("apiKeyAuth")
-
-	r := base
-	secure := r.Group("", echoadapter.Tags("Secure Users"))
+	secure := base.Group("")
 
 	secure.GET("/secure/users", func(c echolib.Context) error {
 		auth := c.Request().Header.Get("Authorization")
@@ -42,14 +41,14 @@ func main() {
 			return c.NoContent(http.StatusUnauthorized)
 		}
 		return echoadapter.JSON(c, http.StatusOK, []SecUser{{ID: "1", Name: "Alice"}})
-	}, echoadapter.Security(&bearer), echoadapter.Res([]SecUser{}))
+	})
 
 	secure.POST("/secure/users", func(c echolib.Context) error {
 		if c.Request().Header.Get("X-API-Key") == "" {
 			return c.NoContent(http.StatusUnauthorized)
 		}
 		return c.NoContent(http.StatusCreated)
-	}, echoadapter.Security(&apiKey), echoadapter.Created())
+	})
 
 	secure.POST("/secure/users/upload", func(c echolib.Context) error {
 		if c.Request().Header.Get("X-API-Key") == "" {
@@ -61,11 +60,7 @@ func main() {
 		}
 		note := c.FormValue("note")
 		return echoadapter.JSON(c, http.StatusOK, map[string]string{"filename": f.Filename, "note": note})
-	},
-		echoadapter.Security(&apiKey),
-		echoadapter.MultipartUpload("file", openapi.MultipartField{Name: "note", Type: openapi.ParamString}),
-		echoadapter.Res(map[string]string{}),
-	)
+	})
 
 	secure.GET("/secure/demo-errors", func(c echolib.Context) error {
 		auth := c.Request().Header.Get("Authorization")
@@ -82,8 +77,8 @@ func main() {
 		default:
 			return echoadapter.JSON(c, http.StatusOK, map[string]string{"status": "ok"})
 		}
-	}, echoadapter.Security(&bearer), echoadapter.Res(map[string]string{}))
+	})
 
-	r.Docs(cfg)
-	_ = r.Echo.Start(":8080")
+	echoadapter.Docs(base, cfg)
+	_ = base.Start(":8080")
 }

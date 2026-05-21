@@ -33,6 +33,9 @@ func BuildSpec(routes []RouteMeta, cfg Config) *openapi3.T {
 			doc.Components.SecuritySchemes[k] = v
 		}
 	}
+	if len(cfg.Security) > 0 {
+		doc.Security = cfg.Security
+	}
 
 	// Config-only registered schemas
 	if cfg.Schemas != nil {

@@ -153,6 +153,26 @@ func TestSecuritySchemesInSpec(t *testing.T) {
 	}
 }
 
+func TestGlobalSecurityInSpec(t *testing.T) {
+	sec := openapi3.NewSecurityRequirement().Authenticate("jwt")
+
+	doc := BuildSpec(nil, Config{
+		Title:   "T",
+		Version: "1",
+		SecuritySchemes: map[string]*openapi3.SecuritySchemeRef{
+			"jwt": {Value: &openapi3.SecurityScheme{Type: "http", Scheme: "bearer", BearerFormat: "JWT"}},
+		},
+		Security: openapi3.SecurityRequirements{sec},
+	})
+
+	if len(doc.Security) != 1 {
+		t.Fatalf("expected global security requirement")
+	}
+	if doc.Security[0]["jwt"] == nil {
+		t.Fatalf("expected jwt security requirement")
+	}
+}
+
 func TestPathParamsInSpec(t *testing.T) {
 	r := NewRouter()
 	r.GET("/users/{id}", func(w http.ResponseWriter, req *http.Request) {

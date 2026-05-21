@@ -200,7 +200,9 @@ In Swagger UI this will show:
 
 ## Security
 
-You can provide security schemes via `openapi.Config.SecuritySchemes` and attach requirements per-route.
+You can provide security schemes via `openapi.Config.SecuritySchemes`.
+For Springdoc-like auto-docs, set `openapi.Config.Security` as a global requirement.
+For route-specific security, attach requirements per route with `openapi.Security(...)` or adapter aliases like `ginadapter.Security(...)`.
 Examples include two schemes:
 
 - **Bearer** JWT (`Authorization: Bearer <token>`)
@@ -216,22 +218,22 @@ Run examples and open Swagger UI:
 
 ### Default (net/http)
 
-- Docs: [`EXAMPLE_HTTPROUTER.md`](./EXAMPLE_HTTPROUTER.md)
+- Docs: [`EXAMPLE_HTTPROUTER.md`](examples/httprouter/EXAMPLE_HTTPROUTER.mdMPLE_HTTPROUTER.md)
   (See the doc above for run commands, endpoints, security, and upload sample.)
 
 ### Gin
 
-- Docs: [`EXAMPLE_GIN.md`](./EXAMPLE_GIN.md)
+- Docs: [`EXAMPLE_GIN.md`](examples/gin/EXAMPLE_GIN.mdMPLE_GIN.md)
   (See the doc above for run commands, endpoints, security, and upload sample.)
 
 ### Echo
 
-- Docs: [`EXAMPLE_ECHO.md`](./EXAMPLE_ECHO.md)
+- Docs: [`EXAMPLE_ECHO.md`](examples/echo/EXAMPLE_ECHO.mdMPLE_ECHO.md)
   (See the doc above for run commands, endpoints, security, and upload sample.)
 
 ### Fiber
 
-- Docs: [`EXAMPLE_FIBER.md`](./EXAMPLE_FIBER.md)
+- Docs: [`EXAMPLE_FIBER.md`](examples/fiber/EXAMPLE_FIBER.mdMPLE_FIBER.md)
   (See the doc above for run commands, endpoints, security, and upload sample.)
 
 ---
@@ -322,7 +324,7 @@ Pattern (recommended):
 
 1. Create your framework engine/app (e.g., `gin`, `echo`, `fiber`).
 2. For zero-config route discovery, call `ginadapter.Docs(engine, cfg)`, `echoadapter.Docs(e, cfg)`, or `fiberadapter.Docs(app, cfg)`. For net/http, use `openapi.New(...)` or `muxadapter.Mount(...)`.
-3. If you want body schemas/tags/security, wrap with `Wrap`/`New` and register routes with short options like `Res`, `Req`, `Tags`, and `Created`.
+3. If you want body schemas/tags/security per route, wrap with `Wrap`/`New` and register routes with short options like `Res`, `Req`, `Tags`, and `Created`.
 4. Run the engine/app.
 
 Examples:
@@ -337,10 +339,9 @@ import (
 )
 
 engine := ginlib.New()
-r := ginadapter.Wrap(engine)
-r.GET("/users", listUsers, ginadapter.Res([]User{}), ginadapter.Tags("Users"))
-r.Docs(openapi.Config{Title: "My API", Version: "0.1.0"})
-r.Engine.Run(":8080")
+engine.GET("/users", listUsers)
+ginadapter.Docs(engine, openapi.Config{Title: "My API", Version: "0.1.0"})
+engine.Run(":8080")
 ```
 
 - Echo
@@ -353,10 +354,9 @@ import (
 )
 
 base := echolib.New()
-r := echoadapter.Wrap(base)
-r.GET("/users", listUsers, echoadapter.Res([]User{}), echoadapter.Tags("Users"))
-r.Docs(openapi.Config{Title: "My API", Version: "0.1.0"})
-r.Echo.Start(":8080")
+base.GET("/users", listUsers)
+echoadapter.Docs(base, openapi.Config{Title: "My API", Version: "0.1.0"})
+base.Start(":8080")
 ```
 
 - Fiber
@@ -369,10 +369,9 @@ import (
 )
 
 app := fiberlib.New()
-r := fiberadapter.Wrap(app)
-r.GET("/users", listUsers, fiberadapter.Res([]User{}), fiberadapter.Tags("Users"))
-r.Docs(openapi.Config{Title: "My API", Version: "0.1.0"})
-r.App.Listen(":8080")
+app.Get("/users", listUsers)
+fiberadapter.Docs(app, openapi.Config{Title: "My API", Version: "0.1.0"})
+app.Listen(":8080")
 ```
 
 Notes:

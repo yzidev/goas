@@ -1,6 +1,6 @@
 # Gin example (OpenAPIGO)
 
-This example uses route-level OpenAPI options so routes, handlers, and docs stay in one place.
+This example uses native Gin routes plus one OpenAPIGO docs call, similar to a Springdoc-style setup.
 
 ## Quick start
 
@@ -52,47 +52,36 @@ import (
 engine := ginlib.Default()      // or ginlib.New()
 ```
 
-3) Wrap the engine with the adapter so OpenAPIGO can capture route metadata
+3) Register handlers with plain Gin
 
 ```go
-r := ginadapter.Wrap(engine)
-```
-
-4) Register handlers with short OpenAPI options
-
-```go
-users := r.Group("", ginadapter.Tags("Users"))
+users := engine.Group("")
 
 users.GET("/users", func(c *ginlib.Context) {
     ginadapter.JSON(c, 200, []User{{ID: "1", Name: "Alice"}})
-}, ginadapter.Res([]User{}))
+})
 
-users.POST("/users", createUser,
+users.POST("/users", createUser)
+users.POST("/users/upload", uploadUserFile)
+users.GET("/users/demo-errors", demoErrors)
+```
+
+4) Mount OpenAPI JSON + Swagger UI and run
+
+```go
+ginadapter.Docs(engine, openapi.Config{Title: "User API", Version: "1.0.0"})
+engine.Run(":8080")
+```
+
+5) Add richer schemas only when you need them
+
+```go
+r := ginadapter.Wrap(engine)
+r.POST("/users", createUser,
     ginadapter.Req(CreateUser{}),
     ginadapter.Res(User{}),
     ginadapter.Created(),
 )
-
-users.POST("/users/upload", uploadUserFile,
-    ginadapter.MultipartUpload("file", openapi.MultipartField{Name: "note", Type: openapi.ParamString}),
-    ginadapter.Res(map[string]string{}),
-)
-
-users.GET("/users/demo-errors", demoErrors,
-    ginadapter.Res(map[string]string{}),
-    ginadapter.Responses(
-        openapi.ResponseSpec{Status: 400, Schema: openapi.ErrorResponse{}},
-        openapi.ResponseSpec{Status: 401, Schema: openapi.ErrorResponse{}},
-        openapi.ResponseSpec{Status: 500, Schema: openapi.ErrorResponse{}},
-    ),
-)
-```
-
-5) Mount OpenAPI JSON + Swagger UI and run
-
-```go
-r.Docs(openapi.Config{Title: "User API", Version: "1.0.0"})
-r.Engine.Run(":8080")
 ```
 
 6) Security (optional)
@@ -108,23 +97,24 @@ cfg := openapi.Config{Title: "API", Version: "1.0.0", SecuritySchemes: map[strin
     "bearer": {Value: bearer},
     "xapikey": {Value: apiKey},
 }}
-// Attach per-route in builder:
-// s.GET("/secure").Security(&openapi3.SecurityRequirement{"bearer": {}}).Res(...).OK()
+bearerReq := openapi3.NewSecurityRequirement().Authenticate("bearer")
+cfg.Security = openapi3.SecurityRequirements{bearerReq}
 ```
 
 9) Troubleshooting
 
 - If you get type errors around constructors: make sure you import Gin framework (github.com/gin-gonic/gin) and the adapter package separately (use aliases to avoid name collisions: `ginlib` vs `ginadapter`).
-- If Swagger UI doesn't show request/response schemas: ensure you declared `Req`/`Res` on the route.
+- Auto-docs can discover paths, methods, and path params from native Gin routes.
+- If Swagger UI doesn't show request/response schemas: add `Req`/`Res` on routes that need explicit body schemas.
 
 ---
 
 ## What to inspect in this repo
 
-- `example/gin/main.go` — demonstrates wrapping an existing engine and registering OpenAPI
-- `example/gin/routes.go` — shows clean route declarations
+- `examples/gin/main.go` — demonstrates native Gin routes with one docs call
+- `examples/gin/routes.go` — shows clean route declarations
 - `openapi/spec` — optional config-first builder for teams that prefer central route metadata
 
 ### Note about core router
 
-The OpenAPIGO core router is a lightweight net/http-backed mux. The Gin adapter continues to work unchanged. For the net/http example you can mount the router on a ServeMux easily (the `httprouter` adapter supports `httprouter.New(mux)` to auto-mount).
+The OpenAPIGO core router is a lightweight net/http-backed mux. The Gin adapter continues to work unchanged. For the net/http example you can mount the router on a ServeMux easily with `muxadapter.Mount(mux, cfg)`.

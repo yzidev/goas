@@ -32,6 +32,7 @@ func main() {
 
 	bearer := openapi3.NewSecurityRequirement().Authenticate("bearerAuth")
 	apiKey := openapi3.NewSecurityRequirement().Authenticate("apiKeyAuth")
+	cfg.Security = openapi3.SecurityRequirements{bearer, apiKey}
 
 	r := openapi.New(cfg)
 	secure := r.Group("", openapi.Tags("Secure Users"))

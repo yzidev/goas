@@ -27,11 +27,9 @@ type ErrorResponse struct {
 func main() {
 	engine := ginlib.New()
 
-	r := ginadapter.Wrap(engine)
+	registerSystemRoutes(engine)
+	registerUserRoutes(engine)
 
-	registerSystemRoutes(r)
-	registerUserRoutes(r)
-
-	r.Docs(openAPICfg())
-	_ = r.Engine.Run(":8080")
+	ginadapter.Docs(engine, openAPICfg())
+	_ = engine.Run(":8080")
 }

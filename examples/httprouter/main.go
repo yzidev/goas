@@ -176,7 +176,13 @@ func api2GetUser(w http.ResponseWriter, req *http.Request) {
 func main() {
 	mux := http.NewServeMux()
 
-	r := muxadapter.New(mux)
+	r := muxadapter.Mount(mux, openapi.Config{
+		Title:   "User API",
+		Version: "1.0.0",
+		Tags: openapi3.Tags{
+			{Name: "Users", Description: "User management endpoints"},
+		},
+	})
 
 	users := r.Group("/api/v1.0", openapi.Tags("Users"))
 	users.GET("/users", listUsers, openapi.Res([]User{}))
@@ -201,14 +207,6 @@ func main() {
 	api2.GET("/hello", api2Hello, openapi.Res(map[string]string{}))
 	api2.POST("/users", api2CreateUser, openapi.Req(CreateUser{}), openapi.Res(User{}), openapi.Created())
 	api2.GET("/users/{id}", api2GetUser, openapi.Res(User{}))
-
-	r.Docs(openapi.Config{
-		Title:   "User API",
-		Version: "1.0.0",
-		Tags: openapi3.Tags{
-			{Name: "Users", Description: "User management endpoints"},
-		},
-	})
 
 	_ = http.ListenAndServe(":8080", mux)
 }
